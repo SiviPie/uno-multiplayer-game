@@ -1,0 +1,17 @@
+/* Target the ScrollPane */
+.scroll-pane {
+    /* Set background color of ScrollPane to transparent */
+    -fx-background-color: transparent;
+}
+
+/* Target the Viewport */
+.scroll-pane .viewport {
+    /* Set background color of the Viewport to transparent */
+    -fx-background-color: transparent;
+}
+
+/* Target the AnchorPane inside the Viewport */
+.scroll-pane .viewport .anchor-pane {
+    /* Set background color of the AnchorPane */
+    -fx-background-color:  #4ae89c; /* Background color */
+}

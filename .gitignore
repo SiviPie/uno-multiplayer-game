@@ -11,6 +11,10 @@ target/
 *.iws
 *.iml
 *.ipr
+out/
+target/
+pom.xml
+mvnw*
 
 ### Eclipse ###
 .apt_generated

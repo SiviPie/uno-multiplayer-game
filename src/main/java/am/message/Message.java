@@ -1,5 +1,6 @@
 package am.message;
 
+import am.uno.Card;
 import am.uno.Player;
 import am.uno.Opponent;
 
@@ -10,10 +11,14 @@ public class Message implements Serializable {
     private MessageType type;
     private String sender;
     private String text;
+    private Card card;
     private GameChoice gameChoice;
     private Player player;
     private ArrayList<Opponent> opponents = new ArrayList<Opponent>();
     private Opponent opponent;
+
+    private int idPlayerToUpdate;
+    private int num_cards;
 
     public Message(MessageType type) {
         this.type = type;
@@ -32,6 +37,10 @@ public class Message implements Serializable {
         return text;
     }
 
+    public Card getCard() {
+        return this.card;
+    }
+
     public GameChoice getGameChoice() {
         return gameChoice;
     }
@@ -48,6 +57,14 @@ public class Message implements Serializable {
         return this.opponent;
     }
 
+    public int getIdPlayerToUpdate() {
+        return  this.idPlayerToUpdate;
+    }
+
+    public int getNum_cards() {
+        return this.num_cards;
+    }
+
     // SETTERS
     public void setType(MessageType type) {
         this.type = type;
@@ -59,6 +76,10 @@ public class Message implements Serializable {
 
     public void setText(String text) {
         this.text = text;
+    }
+
+    public void setCard(Card card) {
+        this.card = card;
     }
 
     public void setGameChoice(GameChoice gameChoice) {
@@ -75,5 +96,13 @@ public class Message implements Serializable {
 
     public void setOpponent(Opponent opponent) {
         this.opponent = opponent;
+    }
+
+    public void setIdPlayerToUpdate(int idPlayerToUpdate) {
+        this.idPlayerToUpdate = idPlayerToUpdate;
+    }
+
+    public void setNum_cards(int num_cards) {
+        this.num_cards = num_cards;
     }
 }

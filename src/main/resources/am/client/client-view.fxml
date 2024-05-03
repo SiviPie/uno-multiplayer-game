@@ -5,23 +5,71 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
 
-
-<AnchorPane prefHeight="310.0" prefWidth="245.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="am.client.ClientController">
+<AnchorPane fx:id="mainClientAnchorPane" prefHeight="310.0" prefWidth="300.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="am.client.ClientController">
    <children>
-      <VBox alignment="CENTER" prefHeight="310.0" prefWidth="245.0" spacing="20.0">
-        <padding>
-          <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
-        </padding>
-      
-        <Label fx:id="titleLabel" text="UNO Client" />
-         <TextField fx:id="ipTextField" promptText="IP" />
-         <TextField fx:id="portTextField" promptText="PORT" />
-         <TextField fx:id="usernameTextField" promptText="Username" />
-        <Button fx:id="connectButton" onAction="#connectButtonClick" text="Connect" />
-         <Button fx:id="disconnectButton" disable="true" onAction="#disconnectButtonClick" text="Disconnect" />
-         <Label fx:id="connectionStatusLabel" text="Connection status" />
+      <VBox alignment="TOP_CENTER" prefHeight="310.0" prefWidth="245.0" style="-fx-background-color: #52489C;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+         <HBox alignment="CENTER" style="-fx-background-color: #434371;">
+            <children>
+            
+              <Label fx:id="titleLabel" text="UNO Client" textFill="#d1f0d1">
+                  <font>
+                     <Font name="Ubuntu Bold" size="16.0" />
+                  </font>
+               </Label>
+            </children>
+            <VBox.margin>
+               <Insets />
+            </VBox.margin>
+            <padding>
+               <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+            </padding>
+         </HBox>
+         <VBox alignment="TOP_CENTER" spacing="20.0" VBox.vgrow="ALWAYS">
+            <children>
+               <TextField fx:id="ipTextField" promptText="IP Address">
+                  <padding>
+                     <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                  </padding>
+               </TextField>
+               <TextField fx:id="portTextField" promptText="PORT">
+                  <padding>
+                     <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                  </padding>
+               </TextField>
+               <TextField fx:id="usernameTextField" promptText="Username">
+                  <padding>
+                     <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                  </padding>
+               </TextField>
+              <Button fx:id="connectButton" minWidth="95.0" onAction="#connectButtonClick" style="-fx-background-color: #17c3b2;" text="Connect" textFill="#1a5b2e">
+                  <font>
+                     <Font name="Ubuntu Bold" size="14.0" />
+                  </font>
+                  <padding>
+                     <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                  </padding>
+               </Button>
+               <Button fx:id="disconnectButton" disable="true" onAction="#disconnectButtonClick" style="-fx-background-color: da627d;" text="Disconnect" textFill="MAROON">
+                  <padding>
+                     <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                  </padding>
+                  <font>
+                     <Font name="Ubuntu Bold" size="14.0" />
+                  </font>
+               </Button>
+               <Label fx:id="connectionStatusLabel" text="Connection status" textFill="WHITE" />
+            </children>
+            <VBox.margin>
+               <Insets />
+            </VBox.margin>
+            <padding>
+               <Insets bottom="20.0" left="30.0" right="30.0" top="20.0" />
+            </padding>
+         </VBox>
       </VBox>
    </children>
 </AnchorPane>

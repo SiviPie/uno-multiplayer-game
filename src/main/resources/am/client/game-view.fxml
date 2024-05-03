@@ -1,57 +1,98 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import java.net.URL?>
 <?import javafx.geometry.Insets?>
+<?import javafx.scene.Cursor?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.SplitPane?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.FlowPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane nodeOrientation="LEFT_TO_RIGHT" prefHeight="700.0" prefWidth="1400.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="am.client.GameController">
+<AnchorPane nodeOrientation="LEFT_TO_RIGHT" prefHeight="900.0" prefWidth="1600.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="am.client.GameController">
    <children>
-      <VBox prefHeight="200.0" prefWidth="100.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+      <VBox AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
-            <HBox fx:id="playerListHbox" alignment="CENTER" prefHeight="100.0" prefWidth="814.0" spacing="20.0">
+            <HBox fx:id="playerListHbox" alignment="CENTER" prefHeight="100.0" prefWidth="814.0" spacing="20.0" style="-fx-background-color: #52489C;">
                <children>
-                  <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" spacing="20.0">
-                     <children>
-                        <Label fx:id="gameUsernameLabel" text="Label" />
-                        <Label text="(Me)" />
-                        <Button fx:id="disconnectButton" mnemonicParsing="false" onAction="#disconnectButtonClick" text="Disconnect" />
-                     </children>
+                  <Button id="disconnectButton" fx:id="disconnectButton" mnemonicParsing="false" onAction="#disconnectButtonClick" stylesheets="@button.css" text="Disconnect" textFill="#ffe3e3">
+                     <font>
+                        <Font name="Ubuntu Bold" size="18.0" />
+                     </font>
+                     <HBox.margin>
+                        <Insets />
+                     </HBox.margin>
                      <padding>
-                        <Insets bottom="10.0" top="10.0" />
+                        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
                      </padding>
-                  </VBox>
+                     <cursor>
+                        <Cursor fx:constant="HAND" />
+                     </cursor>
+                  </Button>
                </children>
                <padding>
-                  <Insets top="10.0" />
+                  <Insets bottom="10.0" top="10.0" />
                </padding>
             </HBox>
-            <HBox alignment="CENTER" prefHeight="200.0" prefWidth="200.0">
+            <HBox alignment="CENTER" prefHeight="300.0" prefWidth="1400.0" spacing="50.0" style="-fx-background-color: #5e60ce;">
                <children>
-                  <Label text="Image" />
+                  <ImageView fx:id="playedCardImage" fitHeight="170.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../../img/Deck.png" />
+                     </image>
+                  </ImageView>
                </children>
                <padding>
-                  <Insets bottom="50.0" top="50.0" />
+                  <Insets bottom="30.0" top="20.0" />
                </padding>
             </HBox>
-            <HBox>
+            <HBox VBox.vgrow="ALWAYS">
                <children>
-                  <SplitPane dividerPositions="0.587171052631579" HBox.hgrow="ALWAYS">
+                  <SplitPane dividerPositions="0.5472103004291845" style="-fx-background-color: #52489C;" stylesheets="@splitpane.css" HBox.hgrow="ALWAYS">
                      <items>
-                        <VBox>
+                        <VBox style="-fx-background-color: #52489C;">
                            <children>
-                              <HBox alignment="BOTTOM_CENTER" prefHeight="100.0" prefWidth="200.0" spacing="20.0">
+                              <HBox alignment="BOTTOM_CENTER" prefHeight="100.0" prefWidth="200.0" spacing="20.0" style="-fx-background-color: #52489C;">
                                  <children>
-                                    <Button mnemonicParsing="false" text="Play card" />
-                                    <Button mnemonicParsing="false" text="Draw card" />
-                                    <Button mnemonicParsing="false" text="Uno!" />
+                                    <Button id="playButton" fx:id="playCardButton" mnemonicParsing="false" onAction="#playCardButtonClick" prefHeight="44.0" prefWidth="114.0" styleClass="actionbutton" stylesheets="@button.css" text="PLAY" textFill="#eaf2ff">
+                                       <padding>
+                                          <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                       </padding>
+                                       <font>
+                                          <Font name="Ubuntu Bold" size="20.0" />
+                                       </font>
+                                       <cursor>
+                                          <Cursor fx:constant="HAND" />
+                                       </cursor></Button>
+                                    <Button id="drawButton" fx:id="drawButton" mnemonicParsing="false" onAction="#drawCardButtonClick" prefHeight="44.0" prefWidth="114.0" styleClass="actionbutton" stylesheets="@button.css" text="DRAW" textFill="#eaf2ff">
+                                       <padding>
+                                          <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                       </padding>
+                                       <font>
+                                          <Font name="Ubuntu Bold" size="20.0" />
+                                       </font>
+                                       <cursor>
+                                          <Cursor fx:constant="HAND" />
+                                       </cursor>
+                                    </Button>
+                                    <Button id="unoButton" mnemonicParsing="false" prefHeight="44.0" prefWidth="114.0" styleClass="actionbutton" stylesheets="@button.css" text="UNO!" textFill="#eaf2ff">
+                                       <padding>
+                                          <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                       </padding>
+                                       <font>
+                                          <Font name="Ubuntu Bold" size="20.0" />
+                                       </font>
+                                       <cursor>
+                                          <Cursor fx:constant="HAND" />
+                                       </cursor>
+                                    </Button>
                                  </children>
                                  <VBox.margin>
                                     <Insets />
@@ -60,96 +101,38 @@
                                     <Insets bottom="20.0" top="20.0" />
                                  </padding>
                               </HBox>
-                              <ScrollPane fitToWidth="true">
+                              <ScrollPane fitToWidth="true" style="-fx-background-color: #52489C;" VBox.vgrow="ALWAYS">
                                  <content>
-                                    <AnchorPane minHeight="0.0" minWidth="0.0">
-                                       <FlowPane AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-                                          <children>
-                                             <VBox alignment="CENTER" prefHeight="200.0" prefWidth="150.0">
-                                                <children>
-                                                   <!-- Add your elements inside the FlowPane here -->
-                                                   <Label text="Element 1">
-                                                      <padding>
-                                                         <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
-                                                      </padding>
-                                                   </Label>
-                                                </children>
-                                             </VBox>
-                                             <VBox alignment="CENTER" prefHeight="200.0" prefWidth="150.0">
-                                                <children>
-                                                   <Label text="Element 2" />
-                                                </children>
-                                             </VBox>
-                                             <VBox alignment="CENTER" prefHeight="200.0" prefWidth="150.0">
-                                                <children>
-                                                   <Label text="Element 3" />
-                                                </children>
-                                             </VBox>
-                                             <VBox alignment="CENTER" prefHeight="200.0" prefWidth="150.0">
-                                                <children>
-                                                   <Label text="Element 4" />
-                                                </children>
-                                             </VBox>
-                                             <VBox alignment="CENTER" prefHeight="200.0" prefWidth="200.0">
-                                                <children>
-                                                   <Label text="Element 5" />
-                                                </children>
-                                             </VBox>
-                                             <VBox alignment="CENTER" prefHeight="200.0" prefWidth="200.0">
-                                                <children>
-                                                   <Label text="Element 6" />
-                                                </children>
-                                             </VBox>
-                                             <VBox alignment="CENTER" prefHeight="200.0" prefWidth="200.0">
-                                                <children>
-                                                   <Label text="Element 7" />
-                                                </children>
-                                             </VBox>
-                                             <VBox alignment="CENTER" prefHeight="200.0" prefWidth="200.0">
-                                                <children>
-                                                   <Label text="Element 8" />
-                                                </children>
-                                             </VBox>
-                                             <VBox alignment="CENTER" prefHeight="200.0" prefWidth="200.0">
-                                                <children>
-                                                   <Label text="Element 9" />
-                                                </children>
-                                             </VBox>
-                                             <VBox alignment="CENTER" prefHeight="200.0" prefWidth="200.0">
-                                                <children>
-                                                   <Label text="Element 10" />
-                                                </children>
-                                             </VBox>
-                                             <VBox alignment="CENTER" prefHeight="200.0" prefWidth="200.0">
-                                                <children>
-                                                   <Label text="Element 1" />
-                                                </children>
-                                             </VBox>
-                                             <!-- Add more elements as needed -->
-                                          </children>
-                                       </FlowPane>
-                                    </AnchorPane>
+                                    <FlowPane fx:id="cardListFlowPane" hgap="10.0" minHeight="464.0" style="-fx-background-color: #48e3c1;" vgap="10.0">
+                                       <padding>
+                                          <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                       </padding>
+                                    </FlowPane>
                                  </content>
+                                 <stylesheets>
+                                    <URL value="@vbar.css" />
+                                    <URL value="@scrollpane.css" />
+                                 </stylesheets>
                               </ScrollPane>
                            </children>
                         </VBox>
-                        <VBox alignment="TOP_CENTER">
+                        <VBox alignment="TOP_CENTER" style="-fx-background-color: #52489C;">
                            <children>
-                              <HBox alignment="CENTER">
+                              <HBox alignment="CENTER" style="-fx-background-color: #52489C;">
                                  <children>
-                                    <Label text="Chat">
+                                    <Label text="Chat" textFill="#c1bcff">
                                        <font>
-                                          <Font size="18.0" />
+                                          <Font name="Monospaced Bold" size="23.0" />
                                        </font>
                                     </Label>
                                  </children>
                                  <padding>
-                                    <Insets bottom="10.0" top="10.0" />
+                                    <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
                                  </padding>
                               </HBox>
-                              <HBox VBox.vgrow="ALWAYS">
+                              <HBox style="-fx-background-color: #56cfe1;" VBox.vgrow="ALWAYS">
                                  <children>
-                                    <ScrollPane fx:id="chatScrollPane" fitToWidth="true" vbarPolicy="ALWAYS" HBox.hgrow="ALWAYS">
+                                    <ScrollPane fx:id="chatScrollPane" fitToWidth="true" HBox.hgrow="ALWAYS">
                                       <content>
                                         <AnchorPane fx:id="chatAnchorPane" minHeight="0.0" minWidth="0.0">
                                              <children>
@@ -157,13 +140,32 @@
                                              </children>
                                           </AnchorPane>
                                       </content>
+                                       <stylesheets>
+                                          <URL value="@vbar.css" />
+                                          <URL value="@scrollpane.css" />
+                                       </stylesheets>
                                     </ScrollPane>
                                  </children>
                               </HBox>
                               <HBox alignment="CENTER" spacing="20.0">
                                  <children>
-                                    <TextField fx:id="textMessageField" promptText="Text message" />
-                                    <Button fx:id="sendMessageButton" mnemonicParsing="false" onAction="#sendMessageButtonClick" text="Send" />
+                                    <TextField fx:id="textMessageField" prefHeight="40.0" prefWidth="368.0" promptText="Send a text">
+                                       <padding>
+                                          <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                       </padding>
+                                       <font>
+                                          <Font size="15.0" />
+                                       </font></TextField>
+                                    <Button fx:id="sendMessageButton" mnemonicParsing="false" onAction="#sendMessageButtonClick" style="-fx-background-color: #342c73; -fx-background-radius: 5;" text="SEND" textFill="WHITE">
+                                       <padding>
+                                          <Insets bottom="14.0" left="14.0" right="14.0" top="14.0" />
+                                       </padding>
+                                       <font>
+                                          <Font name="Ubuntu Bold" size="15.0" />
+                                       </font>
+                                       <cursor>
+                                          <Cursor fx:constant="MOVE" />
+                                       </cursor></Button>
                                  </children>
                                  <padding>
                                     <Insets bottom="10.0" top="10.0" />
@@ -177,5 +179,46 @@
             </HBox>
          </children>
       </VBox>
+      <HBox fx:id="colorPickerHbox" alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="20.0" style="-fx-opacity: 1;" visible="false" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+         <children>
+            <AnchorPane HBox.hgrow="ALWAYS">
+               <children>
+                  <AnchorPane onMouseClicked="#chooseColorBlue" style="-fx-background-color: black; -fx-opacity: 0.4;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                  <HBox alignment="CENTER" spacing="20.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                     <children>
+                        <VBox alignment="CENTER" spacing="20.0">
+                           <children>
+                              <Button fx:id="redColorButton" mnemonicParsing="false" onAction="#chooseColorRed" prefHeight="250.0" prefWidth="250.0" styleClass="colorbutton" stylesheets="@button.css">
+                                 <cursor>
+                                    <Cursor fx:constant="HAND" />
+                                 </cursor>
+                              </Button>
+                              <Button fx:id="blueColorButton" mnemonicParsing="false" onAction="#chooseColorBlue" prefHeight="250.0" prefWidth="250.0" styleClass="colorbutton" stylesheets="@button.css">
+                                 <cursor>
+                                    <Cursor fx:constant="HAND" />
+                                 </cursor>
+                              </Button>
+                           </children>
+                        </VBox>
+                        <VBox alignment="CENTER" spacing="20.0">
+                           <children>
+                              <Button fx:id="yellowColorButton" mnemonicParsing="false" onAction="#chooseColorYellow" prefHeight="250.0" prefWidth="250.0" styleClass="colorbutton" stylesheets="@button.css">
+                                 <cursor>
+                                    <Cursor fx:constant="HAND" />
+                                 </cursor>
+                              </Button>
+                              <Button fx:id="greenColorButton" mnemonicParsing="false" onAction="#chooseColorGreen" prefHeight="250.0" prefWidth="250.0" styleClass="colorbutton" stylesheets="@button.css">
+                                 <cursor>
+                                    <Cursor fx:constant="HAND" />
+                                 </cursor>
+                              </Button>
+                           </children>
+                        </VBox>
+                     </children>
+                  </HBox>
+               </children>
+            </AnchorPane>
+         </children>
+      </HBox>
    </children>
 </AnchorPane>

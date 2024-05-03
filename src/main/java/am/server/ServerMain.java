@@ -11,7 +11,7 @@ public class ServerMain extends Application {
     @Override
     public void start(Stage stage) throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(ServerMain.class.getResource("server-view.fxml"));
-        Scene scene = new Scene(fxmlLoader.load(), 400, 280);
+        Scene scene = new Scene(fxmlLoader.load(), 420, 340);
         stage.setTitle("Uno Server");
         stage.setScene(scene);
         stage.show();

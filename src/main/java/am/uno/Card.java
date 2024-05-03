@@ -62,9 +62,37 @@ public class Card implements Serializable {
         return this.number;
     }
 
+    public String getName() {
+        // Returns a string with the card name
+        // Number cards: Color_number
+        // Skip cards: Color_skip
+        // Reverse cards: Color_reverse
+        // Draw2: Color_Draw2
+        // Wild cards: Wild
+        // Wild_Draw cards: Wild_Draw
+
+        if (this.type == CardType.Wild || this.type == CardType.WildDraw4) {
+            return String.valueOf(this.type);
+        }
+
+        String name = this.color + "_";
+
+        if (this.type == CardType.Number) {
+            name = name + this.number;
+        } else {
+            name = name + this.type;
+        }
+
+        return name;
+    }
+
     /*** OTHER METHODS ***/
 
     public void showInfo() {
         System.out.println( "Type: " + type + ((this.color != null) ? (" Color: " + color) : ("")) +   ((this.number >= 0) ? (" Number: " + number) : ("")));
+    }
+
+    public Boolean isStackable() {
+        return (this.type == CardType.Skip) || (this.type == CardType.Draw2) || (this.type == CardType.WildDraw4);
     }
 }

@@ -7,40 +7,74 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
 
-<AnchorPane prefHeight="280.0" prefWidth="400.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="am.server.ServerController">
+<AnchorPane prefHeight="340.0" prefWidth="420.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="am.server.ServerController">
    <children>
-      <VBox alignment="CENTER" prefHeight="200.0" prefWidth="400.0" spacing="20.0">
-         <padding>
-            <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
-         </padding>
+      <VBox alignment="CENTER" prefHeight="200.0" prefWidth="400.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
-            <Label fx:id="titleLabel" text="UNO Server" />
-            <HBox prefHeight="200.0" prefWidth="400.0" VBox.vgrow="ALWAYS">
+            <HBox alignment="CENTER" style="-fx-background-color: #434371;" VBox.vgrow="ALWAYS">
                <children>
-                  <VBox alignment="TOP_CENTER" prefHeight="200.0" prefWidth="200.0" spacing="20.0">
+                  <Label fx:id="titleLabel" alignment="CENTER" contentDisplay="CENTER" text="UNO Server" textFill="#d1f0d1">
+                     <font>
+                        <Font name="Ubuntu Bold" size="16.0" />
+                     </font>
+                  </Label>
+               </children>
+               <padding>
+                  <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+               </padding>
+            </HBox>
+            <HBox spacing="10.0" style="-fx-background-color: #52489C;" VBox.vgrow="ALWAYS">
+               <children>
+                  <VBox alignment="TOP_CENTER" prefHeight="200.0" prefWidth="200.0" spacing="20.0" HBox.hgrow="ALWAYS">
                      <children>
-                        <TextField fx:id="portTextField" promptText="PORT" />
-                        <Button fx:id="startServerButton" onAction="#startServerButtonClick" text="Start Server" />
-                        <Button fx:id="stopServerButton" disable="true" onAction="#stopServerButtonClick" text="Stop Server" />
-                        <Label fx:id="serverStatusLabel" text="Server status" />
-                        <Label fx:id="numberOfConnectionsLabel" text="0">
+                        <TextField fx:id="portTextField" promptText="PORT">
+                           <padding>
+                              <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                           </padding></TextField>
+                        <Button fx:id="startServerButton" onAction="#startServerButtonClick" prefWidth="102.0" style="-fx-background-color: #17c3b2;" text="Start Server" textFill="#1a5b2e">
+                           <padding>
+                              <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                           </padding>
+                           <font>
+                              <Font name="Ubuntu Bold" size="14.0" />
+                           </font></Button>
+                        <Button fx:id="stopServerButton" disable="true" onAction="#stopServerButtonClick" prefWidth="102.0" style="-fx-background-color: da627d;" text="Stop Server" textFill="#800000">
+                           <padding>
+                              <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                           </padding>
+                           <font>
+                              <Font name="Ubuntu Bold" size="14.0" />
+                           </font></Button>
+                        <Label fx:id="serverStatusLabel" text="Server status" textFill="WHITE" />
+                        <Label fx:id="numberOfConnectionsLabel" text="0" textFill="WHITE">
                            <graphic>
-                              <Label fx:id="connectionsLabel" text="Connections:" />
+                              <Label fx:id="connectionsLabel" text="Connections:" textFill="WHITE" />
                            </graphic>
                         </Label>
                      </children>
                   </VBox>
-                  <VBox alignment="TOP_CENTER" prefHeight="200.0" prefWidth="200.0" spacing="20.0">
+                  <VBox alignment="CENTER" prefHeight="200.0" prefWidth="200.0" spacing="20.0" HBox.hgrow="ALWAYS">
                      <children>
-                        <Button fx:id="greetPlayersButton" disable="true" onAction="#greetPlayersButtonClick" text="Greet Players" />
-                        <Button fx:id="giveCardsButton" disable="true" onAction="#giveCardsButtonClick" text="Give cards" />
-                        <Button fx:id="printFirstPlayerCardsButton" onAction="#printFirstPlayerCardsButtonClick" text="Print c1 cards" />
-                        <Button fx:id="startGameButton" onAction="#startGameButtonClick" text="Start Game" />
-                        <Button fx:id="updatePlayerListButton" onAction="#updatePlayerListButtonClick" text="Start Game" />
+                        <Button fx:id="greetPlayersButton" disable="true" minWidth="108.0" onAction="#greetPlayersButtonClick" style="-fx-background-color: #17c3b2;" text="Greet Players">
+                           <padding>
+                              <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                           </padding></Button>
+                        <Button fx:id="giveCardsButton" disable="true" minWidth="108.0" onAction="#giveCardsButtonClick" style="-fx-background-color: #17c3b2;" text="Give cards">
+                           <padding>
+                              <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                           </padding></Button>
+                        <Button fx:id="startGameButton" disable="true" minWidth="108.0" onAction="#startGameButtonClick" style="-fx-background-color: #17c3b2;" text="Start Game">
+                           <padding>
+                              <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                           </padding></Button>
                      </children>
                   </VBox>
                </children>
+               <padding>
+                  <Insets bottom="30.0" left="30.0" right="30.0" top="30.0" />
+               </padding>
             </HBox>
          </children>
       </VBox>

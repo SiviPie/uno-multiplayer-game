@@ -81,9 +81,13 @@ public class Game {
         int randomIndex = random.nextInt(cardDeck.getSize());
 
         Card card = cardDeck.getCard(randomIndex);
-        cardDeck.removeCard(card);
+        cardDeck.removeCardByName(card);
 
         return card;
+    }
+
+    public void addCard(Card card) {
+        this.cardDeck.addCard(card);
     }
 
     public void showCardDeck() {

@@ -11,7 +11,7 @@ public class ClientMain extends Application {
     @Override
     public void start(Stage stage) throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(ClientMain.class.getResource("client-view.fxml"));
-        Scene scene = new Scene(fxmlLoader.load(), 245, 310);
+        Scene scene = new Scene(fxmlLoader.load(), 300, 395);
         stage.setTitle("Uno Client");
         stage.setScene(scene);
         stage.show();

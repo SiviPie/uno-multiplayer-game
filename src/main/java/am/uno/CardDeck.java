@@ -64,8 +64,14 @@ public class CardDeck implements Serializable {
         return this.cards.size();
     }
 
-    public void removeCard(Card card) {
-        this.cards.remove(card);
+    public void removeCardByName(Card card) {
+        for (Card card_aux : cards) {
+            if (card_aux.getName().equals(card.getName())) {
+                this.cards.remove(card_aux);
+                break;
+            }
+        }
+
     }
 
     public void printCards() {

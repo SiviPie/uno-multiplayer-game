@@ -1,31 +1,23 @@
 package am.server;
 
 import am.uno.Game;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
-import javafx.geometry.Insets;
-import javafx.geometry.Pos;
+import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.HBox;
-import javafx.scene.paint.Color;
-import javafx.scene.text.Text;
-import javafx.scene.text.TextFlow;
-import javafx.stage.Stage;
+import javafx.scene.input.KeyCode;
 
 import java.io.IOException;
-import java.net.ServerSocket;
+import java.net.URL;
+import java.util.ResourceBundle;
 
-public class ServerController {
+public class ServerController  implements Initializable {
     // LABELS
     @FXML
     private Label titleLabel;
     @FXML
     private Label serverStatusLabel;
-    @FXML
-    private Label connectionsLabel;
     @FXML
     private Label numberOfConnectionsLabel;
 
@@ -43,13 +35,11 @@ public class ServerController {
     @FXML
     private Button giveCardsButton;
     @FXML
-    private Button printFirstPlayerCardsButton;
-    @FXML
-    private Button updatePlayerListButtonC;
-
+    private Button startGameButton;
 
     private Server server;
-    private Game game;
+
+    private Boolean serverStarted = false;
 
     @FXML
     protected void startServerButtonClick() {
@@ -60,12 +50,12 @@ public class ServerController {
 
             server.startListening(numberOfConnectionsLabel);
 
+            serverStarted = true;
+
             serverStatusLabel.setText("Server started on port " + port);
 
-
-
             // CREATE GAME
-            game = new Game();
+            server.setGame(new Game());
 
             // make start button inactive
             startServerButton.setDisable(true);
@@ -75,6 +65,7 @@ public class ServerController {
             // make client interraction buttons active
             greetPlayersButton.setDisable(false);
             giveCardsButton.setDisable(false);
+            startGameButton.setDisable(false);
 
             // make startButton inactive
             startServerButton.setDisable(true);
@@ -92,8 +83,10 @@ public class ServerController {
     }
 
     @FXML
-    private void stopServerButtonClick(ActionEvent event) throws IOException {
+    private void stopServerButtonClick() {
         server.closeServer(numberOfConnectionsLabel);
+
+        serverStarted = false;
 
         // make stopButton inactive
         stopServerButton.setDisable(true);
@@ -101,6 +94,7 @@ public class ServerController {
         // make client interraction buttons inactive
         greetPlayersButton.setDisable(true);
         giveCardsButton.setDisable(true);
+        startGameButton.setDisable(true);
 
         // make startButton active
         startServerButton.setDisable(false);
@@ -110,33 +104,36 @@ public class ServerController {
     }
 
     @FXML
-    private void greetPlayersButtonClick(ActionEvent event) throws IOException {
+    private void greetPlayersButtonClick() {
         server.broadcastTextMessage("hehehe");
         System.out.println("[Server]: Greeted clients");
     }
 
     @FXML
-    private void giveCardsButtonClick(ActionEvent event) throws IOException {
+    private void giveCardsButtonClick() {
         server.giveCardsToPlayers();
         System.out.println("[Server]: Gave cards to players!");
     }
 
     @FXML
-    private void printFirstPlayerCardsButtonClick(ActionEvent event) throws  IOException {
-        server.printFirstPlayerCards();
-    }
-
-
-    @FXML
-    private void updatePlayerListButtonClick(ActionEvent event) throws IOException {
-        server.broadcastPlayerList();
-    }
-
-
-    @FXML
-    private void startGameButtonClick(ActionEvent event) throws  IOException {
+    private void startGameButtonClick() {
         server.setGameStarted(true);
+        server.setFirstCard();
+        server.giveCardsToPlayers();
+        server.setFirstPlayerTurn();
         System.out.println("GAME started!");
     }
 
+    @Override
+    public void initialize(URL url, ResourceBundle resourceBundle) {
+        portTextField.setOnKeyPressed(event -> {
+            if (!serverStarted) {
+                if (event.getCode() == KeyCode.ENTER) {
+                    startServerButtonClick();
+                }
+            } else {
+                System.out.println("Server already started.");
+            }
+        });
+    }
 }

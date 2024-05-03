@@ -1,5 +1,8 @@
 package am.server;
 
+import am.message.MessageType;
+import am.uno.Card;
+import am.uno.Game;
 import javafx.application.Platform;
 import javafx.scene.control.Label;
 
@@ -18,6 +21,8 @@ public class Server {
     private boolean isRunning = true;
 
     private boolean gameStarted = false;
+
+    protected static Game game;
 
     Timer timer;
 
@@ -65,6 +70,10 @@ public class Server {
         }, 0, 5000); // Scan every 5 seconds
     }
 
+    public void setGame(Game game) {
+        this.game = game;
+    }
+
     private void scanForClientHandlers(Label numberOfConnectionsLabel) {
         // Perform your scan logic here
         // System.out.println("[Server]: Scanning for client handlers..." + ClientHandler.clients.size());
@@ -72,11 +81,34 @@ public class Server {
     }
 
     public void giveCardsToPlayers() {
-        // TODO
+        for (int i = 0; i < 5; i++) {
+            for (ClientHandler client : ClientHandler.clients) {
+                Card card = game.popRandomCard();
+                // Add card to player info
+                client.player.addCard(card);
+
+                // Send to client
+                client.sendCardToClient(card);
+            }
+        }
+
+        ClientHandler.updateOpponentsForAllClientHandlers();
+        broadcastAllPlayersCardsNumber();
+    }
+
+    public void setFirstCard() {
+        Card card = game.popRandomCard();
+        for (ClientHandler client : ClientHandler.clients) {
+            client.sendFirstPlayedCard(card);
+        }
     }
 
     public void printFirstPlayerCards() {
         // TODO
+    }
+
+    public void broadcastAllPlayersCardsNumber() {
+        ClientHandler.broadcastAllPlayerCardsNumber();
     }
 
     public void broadcastTextMessage(String message){
@@ -104,14 +136,15 @@ public class Server {
             this.timer.cancel(); // Cancel the timer task
         }
 
-
         try {
-            serverSocket.close(); // Close the server socket to interrupt accept()
-
             System.out.println("[Server]: Closing client by client");
 
             while (!ClientHandler.clients.isEmpty()) {
                 closeOneConnection(numberOfConnectionsLabel);
+            }
+
+            if (serverSocket != null) {
+                serverSocket.close(); // Close the server socket to interrupt accept()
             }
 
             updateNumberOfConnectionsLabel(numberOfConnectionsLabel);
@@ -134,4 +167,13 @@ public class Server {
 
         updateNumberOfConnectionsLabel(numberOfConnectionsLabel);
     }
+
+    public void setFirstPlayerTurn() {
+        ClientHandler.playerTurn = ClientHandler.opponents.getFirst();
+
+        for (ClientHandler client : ClientHandler.clients) {
+            client.sendOpponentToClient(ClientHandler.playerTurn, MessageType.PLAYER_TURN);
+        }
+    }
+
 }
