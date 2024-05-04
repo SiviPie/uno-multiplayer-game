@@ -1,7 +1,8 @@
 package am.server;
 
-import am.message.MessageType;
+import am.message.GameUpdate;
 import am.uno.Card;
+import am.uno.CardType;
 import am.uno.Game;
 import javafx.application.Platform;
 import javafx.scene.control.Label;
@@ -75,8 +76,6 @@ public class Server {
     }
 
     private void scanForClientHandlers(Label numberOfConnectionsLabel) {
-        // Perform your scan logic here
-        // System.out.println("[Server]: Scanning for client handlers..." + ClientHandler.clients.size());
         updateNumberOfConnectionsLabel(numberOfConnectionsLabel);
     }
 
@@ -97,14 +96,22 @@ public class Server {
     }
 
     public void setFirstCard() {
+
         Card card = game.popRandomCard();
+
+        // Check if card is WILD
+        while ((card.getType() == CardType.Wild) || (card.getType() == CardType.WildDraw4)) {
+            // Add card back to pile
+            game.addCard(card);
+            // Try again
+            card = game.popRandomCard();
+        }
+
+        // TODO: Handle Draw2
+
         for (ClientHandler client : ClientHandler.clients) {
             client.sendFirstPlayedCard(card);
         }
-    }
-
-    public void printFirstPlayerCards() {
-        // TODO
     }
 
     public void broadcastAllPlayersCardsNumber() {
@@ -113,11 +120,6 @@ public class Server {
 
     public void broadcastTextMessage(String message){
         ClientHandler.broadcastTextMessageFromServer(message);
-    }
-
-
-    public void broadcastPlayerList() {
-
     }
 
     private void updateNumberOfConnectionsLabel(Label numberOfConnectionsLabel) {
@@ -171,9 +173,7 @@ public class Server {
     public void setFirstPlayerTurn() {
         ClientHandler.playerTurn = ClientHandler.opponents.getFirst();
 
-        for (ClientHandler client : ClientHandler.clients) {
-            client.sendOpponentToClient(ClientHandler.playerTurn, MessageType.PLAYER_TURN);
-        }
+        ClientHandler.broadcastPlayerTurn();
     }
 
 }

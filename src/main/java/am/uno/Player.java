@@ -11,12 +11,14 @@ public class Player implements Serializable {
     int imageId;
     String username;
     CardDeck cards;
+    int leftSkipTurns; // Number of turns the player should skip
 
     public Player(String username, int id, int imageId) {
         this.username = username;
         this.imageId = imageId;
         this.cards = new CardDeck();
         this.id = id;
+        leftSkipTurns = 0;
     }
 
     public void addCard(Card card) {
@@ -31,6 +33,8 @@ public class Player implements Serializable {
     public void popCard(Card card) {
         this.cards.removeCardByName(card);
     }
+
+    public void setLeftSkipTurns(int leftSkipTurns) { this.leftSkipTurns = leftSkipTurns; }
 
     // GETTER
     public String getUsername() {
@@ -52,4 +56,6 @@ public class Player implements Serializable {
     public int getNumCards() {
         return this.cards.getSize();
     }
+
+    public int getLeftSkipTurns() { return this.leftSkipTurns; }
 }

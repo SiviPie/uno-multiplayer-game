@@ -7,15 +7,11 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
-
-import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
 public class ServerController  implements Initializable {
     // LABELS
-    @FXML
-    private Label titleLabel;
     @FXML
     private Label serverStatusLabel;
     @FXML
@@ -32,8 +28,6 @@ public class ServerController  implements Initializable {
     private Button stopServerButton;
     @FXML
     private Button greetPlayersButton;
-    @FXML
-    private Button giveCardsButton;
     @FXML
     private Button startGameButton;
 
@@ -64,7 +58,6 @@ public class ServerController  implements Initializable {
 
             // make client interraction buttons active
             greetPlayersButton.setDisable(false);
-            giveCardsButton.setDisable(false);
             startGameButton.setDisable(false);
 
             // make startButton inactive
@@ -93,7 +86,6 @@ public class ServerController  implements Initializable {
 
         // make client interraction buttons inactive
         greetPlayersButton.setDisable(true);
-        giveCardsButton.setDisable(true);
         startGameButton.setDisable(true);
 
         // make startButton active
@@ -105,22 +97,24 @@ public class ServerController  implements Initializable {
 
     @FXML
     private void greetPlayersButtonClick() {
-        server.broadcastTextMessage("hehehe");
+        server.broadcastTextMessage("Hello!");
         System.out.println("[Server]: Greeted clients");
     }
 
     @FXML
-    private void giveCardsButtonClick() {
-        server.giveCardsToPlayers();
-        System.out.println("[Server]: Gave cards to players!");
-    }
-
-    @FXML
     private void startGameButtonClick() {
+        if (ClientHandler.clients.size() < 2) {
+            System.out.println("Now enough players to start the game.");
+            return;
+        }
+
         server.setGameStarted(true);
         server.setFirstCard();
         server.giveCardsToPlayers();
         server.setFirstPlayerTurn();
+
+        startGameButton.setDisable(true);
+
         System.out.println("GAME started!");
     }
 

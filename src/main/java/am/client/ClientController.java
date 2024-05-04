@@ -56,19 +56,16 @@ public class ClientController implements GameController.WindowCloseListener, Ini
     @FXML
     private Button disconnectButton;
 
-
-    // GAMEVIEW
-
-
     Client client;
-
-    // Injected FXMLLoader for loading the second window
-    private FXMLLoader gameLoader;
 
     // Controller for the second window
     private static GameController gameController;
 
     static String previousTextMessageSender = "";
+
+    public static void setDirection(boolean direction) {
+        Platform.runLater(() -> gameController.setDirection(direction));
+    }
 
     @FXML
     protected void connectButtonClick() {
@@ -120,13 +117,6 @@ public class ClientController implements GameController.WindowCloseListener, Ini
     public static void addPlayerToList(Opponent player) {
         // TODO
 
-        // VBOX: Spacing 10, Alignment Center
-        // - ImageView : fitHeight: 80px
-        // - Label : Color white
-        // - HBox: Alignment Center
-        // -- ImageView : fitHeight: 50, fitWidth: 34.5
-        // -- Label: " : number"
-
         VBox vbox = new VBox();
         vbox.setId("player_" + player.getId());
         vbox.setAlignment(Pos.CENTER);
@@ -159,15 +149,19 @@ public class ClientController implements GameController.WindowCloseListener, Ini
         Label cardsLabel = new Label(" : " + player.getNum_cards());
         cardsLabel.setFont(Font.font("Arial", 16));
         cardsLabel.setTextFill(Color.WHITE);
-        // TODO: Make white
 
         hbox.getChildren().add(cardsImageView);
         hbox.getChildren().add(cardsLabel);
+
+        Label skipLabel = new Label("Skip: " + player.getLeftSkipTurns());
+        skipLabel.setFont(Font.font("Arial", 16));
+        skipLabel.setTextFill(Color.WHITE);
 
         //vbox.getChildren().add(pfpImageView);
         vbox.getChildren().add(clippingCircle);
         vbox.getChildren().add(usernameLabel);
         vbox.getChildren().add(hbox);
+        vbox.getChildren().add(skipLabel);
 
         Platform.runLater(() -> gameController.playerListHbox.getChildren().add(vbox));
 
@@ -175,10 +169,15 @@ public class ClientController implements GameController.WindowCloseListener, Ini
     }
 
     public static void setPlayerCards(Opponent opponent) {
-
         Platform.runLater(() -> gameController.setPlayerCards(opponent.getId(), opponent.getNum_cards()));
 
-        System.out.println("SET PLAYER CARDS");
+        System.out.println("Set Player " + opponent.getUsername() + " cards");
+    }
+
+    public static void setPlayerSkipTurns(Opponent opponent) {
+        Platform.runLater(() -> gameController.setPlayerSkipTurns(opponent.getId(), opponent.getLeftSkipTurns()));
+
+        System.out.println("Set Player " + opponent.getUsername() + " skip turns");
     }
 
     public static void removePlayerFromList(int id) {
@@ -202,13 +201,11 @@ public class ClientController implements GameController.WindowCloseListener, Ini
         });
     }
 
-    public static void addTextMessageFromOthers(String username, String message) {
-        /*
-        VBOX:
-            - Hbox cu username
-            - Hbox cu mesajul
-         */
+    public static void setPlayerTurn(String username, boolean isMyTurn) {
+        Platform.runLater(() -> gameController.setPlayerTurn(username, isMyTurn));
+    }
 
+    public static void addTextMessageFromOthers(String username, String message) {
         VBox vbox = new VBox();
 
         HBox hbox_username = new HBox();
@@ -302,13 +299,11 @@ public class ClientController implements GameController.WindowCloseListener, Ini
         Platform.runLater(() -> gameController.deselectCard());
     }
 
-    @FXML
-    private AnchorPane mainClientAnchorPane;
-
     private void openGameWindow() {
         try {
             // Load the FXML file for the game window
-            gameLoader = new FXMLLoader(getClass().getResource("game-view.fxml"));
+            // Injected FXMLLoader for loading the second window
+            FXMLLoader gameLoader = new FXMLLoader(getClass().getResource("game-view.fxml"));
             Parent root = gameLoader.load();
 
             // Get the controller of the second window
@@ -332,7 +327,6 @@ public class ClientController implements GameController.WindowCloseListener, Ini
             // Set properties
             gameController.chatVbox.heightProperty().addListener((observableValue, number, t1) -> gameController.chatScrollPane.setVvalue((Double) t1));
 
-
             // Get the screen dimensions
             double screenWidth = Screen.getPrimary().getVisualBounds().getWidth();
             double screenHeight = Screen.getPrimary().getVisualBounds().getHeight();
@@ -341,20 +335,14 @@ public class ClientController implements GameController.WindowCloseListener, Ini
             double windowWidth = 5 * screenWidth / 6;
             double windowHeight = 5 * screenHeight / 6;
 
-            // Set the window position to the left half of the screen
-            // double windowX = 0;
-            // double windowY = 0;
-
             // Create a new stage for the game window
             Stage gameStage = new Stage();
             gameStage.setTitle("Game Window");
             gameStage.setScene(new Scene(root));
 
-            // gameStage.setX(windowX);
-            // gameStage.setY(windowY);
             gameStage.setWidth(windowWidth);
             gameStage.setHeight(windowHeight);
-            //gameStage.setFullScreen(true);
+            gameStage.setTitle("UNO Game");
 
             // Show the game window
             gameStage.show();
@@ -363,6 +351,27 @@ public class ClientController implements GameController.WindowCloseListener, Ini
         }
     }
 
+    public static void addCardToStack(Card card) {
+        Image image = new Image(Objects.requireNonNull(ClientController.class.getResourceAsStream("/am/client/img/" + card.getName() + ".png")));
+        ImageViewWithCard imageView = new ImageViewWithCard(card, image);
+
+        imageView.setFitWidth(55.2);
+        imageView.setFitHeight(80);
+
+        Platform.runLater(() -> gameController.cardsStackHbox.getChildren().add(imageView));
+    }
+
+    public static void clearCardsStack() {
+        Platform.runLater(() -> gameController.cardsStackHbox.getChildren().clear());
+    }
+
+    public static void setWildColor(am.uno.Color color) {
+        Platform.runLater(() -> gameController.setWildColor(color));
+    }
+
+    public static void removeWildColor() {
+        Platform.runLater(() -> gameController.clearWildColor());
+    }
 
     @Override
     public void onWindowClose() {

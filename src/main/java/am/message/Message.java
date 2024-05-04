@@ -1,6 +1,7 @@
 package am.message;
 
 import am.uno.Card;
+import am.uno.Color;
 import am.uno.Player;
 import am.uno.Opponent;
 
@@ -9,16 +10,24 @@ import java.util.ArrayList;
 
 public class Message implements Serializable {
     private MessageType type;
+
+    private GameChoice gameChoice;
+    private GameUpdate gameUpdate;
+
     private String sender;
     private String text;
+
     private Card card;
-    private GameChoice gameChoice;
+    private Color color;
+
     private Player player;
     private ArrayList<Opponent> opponents = new ArrayList<Opponent>();
     private Opponent opponent;
 
     private int idPlayerToUpdate;
-    private int num_cards;
+    private int num;
+    private boolean saidUno;
+    private boolean direction = true;
 
     public Message(MessageType type) {
         this.type = type;
@@ -61,8 +70,24 @@ public class Message implements Serializable {
         return  this.idPlayerToUpdate;
     }
 
-    public int getNum_cards() {
-        return this.num_cards;
+    public int getNum() {
+        return this.num;
+    }
+
+    public GameUpdate getGameUpdate() {
+        return gameUpdate;
+    }
+
+    public boolean getSaidUno() {
+        return saidUno;
+    }
+
+    public boolean getDirection() {
+        return direction;
+    }
+
+    public Color getColor() {
+        return color;
     }
 
     // SETTERS
@@ -102,7 +127,23 @@ public class Message implements Serializable {
         this.idPlayerToUpdate = idPlayerToUpdate;
     }
 
-    public void setNum_cards(int num_cards) {
-        this.num_cards = num_cards;
+    public void setNum(int num) {
+        this.num = num;
+    }
+
+    public void setGameUpdate(GameUpdate gameUpdate) {
+        this.gameUpdate = gameUpdate;
+    }
+
+    public void setSaidUno(boolean saidUno) {
+        this.saidUno = saidUno;
+    }
+
+    public void setDirection(boolean direction) {
+        this.direction = direction;
+    }
+
+    public void setColor(Color color) {
+        this.color = color;
     }
 }

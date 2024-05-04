@@ -9,12 +9,14 @@ public class Opponent implements Serializable {
     String username;
     int num_cards;
     int imageId;
+    int leftSkipTurns;
 
     public Opponent(Player player) {
         this.id = player.getID();
         this.username = player.getUsername();
         this.num_cards = player.getNumCards();
         this.imageId = player.getImageId();
+        this.leftSkipTurns = player.getLeftSkipTurns();
     }
 
     // SETTERS
@@ -23,6 +25,7 @@ public class Opponent implements Serializable {
         this.username = player.getUsername();
         this.num_cards = player.getNumCards();
         this.imageId = player.getImageId();
+        this.leftSkipTurns = player.getLeftSkipTurns();
     }
 
     public void setOpponent(Opponent opponent) {
@@ -30,11 +33,14 @@ public class Opponent implements Serializable {
         this.username = opponent.getUsername();
         this.num_cards = opponent.getNum_cards();
         this.imageId = opponent.getImageId();
+        this.leftSkipTurns = opponent.getLeftSkipTurns();
     }
 
     public void setNum_cards(int num_cards) {
         this.num_cards = num_cards;
     }
+
+    public void setLeftSkipTurns(int leftSkipTurns) { this.leftSkipTurns = leftSkipTurns; }
 
     // GETTERS
     public int getId() {
@@ -52,4 +58,6 @@ public class Opponent implements Serializable {
     public int getNum_cards() {
         return this.num_cards;
     }
+
+    public int getLeftSkipTurns() { return this.leftSkipTurns; }
 }
