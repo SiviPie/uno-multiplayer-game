@@ -47,7 +47,8 @@ public class Client {
         switch (card.getType()) {
             case CardType.Number:
                 if ((lastPlayedCard.getType() == CardType.Number && (lastPlayedCard.getNumber() == card.getNumber() || lastPlayedCard.getColor() == card.getColor()))
-                        || ((lastPlayedCard.getType() == CardType.Skip || lastPlayedCard.getType() == CardType.Reverse) && (lastPlayedCard.getColor() == card.getColor()))
+                        || ((lastPlayedCard.getType() == CardType.Skip) && cardsStack.isEmpty() && (lastPlayedCard.getColor() == card.getColor()))
+                        || ((lastPlayedCard.getType() == CardType.Reverse) && (lastPlayedCard.getColor() == card.getColor()))
                         || ((lastPlayedCard.getType() == CardType.Wild) && (wildColor == card.getColor()))
                         || ((lastPlayedCard.getType() == CardType.Draw2) && cardsStack.isEmpty() && (lastPlayedCard.getColor() == card.getColor()))
                         || ((lastPlayedCard.getType() == CardType.WildDraw4) && cardsStack.isEmpty() && (wildColor == card.getColor()))) {
@@ -69,10 +70,11 @@ public class Client {
 
             case CardType.Reverse:
                 if (lastPlayedCard.getType() == CardType.Reverse
-                    || ((lastPlayedCard.getType() == CardType.Number || lastPlayedCard.getType() == CardType.Skip) && (lastPlayedCard.getColor() == card.getColor()))
-                    || ((lastPlayedCard.getType() == CardType.Wild) && (wildColor == card.getColor()))
-                    || ((lastPlayedCard.getType() == CardType.Draw2) && cardsStack.isEmpty() && (lastPlayedCard.getColor() == card.getColor()))
-                    || ((lastPlayedCard.getType() == CardType.WildDraw4) && cardsStack.isEmpty() && (wildColor == card.getColor()))) {
+                        || ((lastPlayedCard.getType() == CardType.Skip) && cardsStack.isEmpty() && (lastPlayedCard.getColor() == card.getColor()))
+                        || ((lastPlayedCard.getType() == CardType.Number) && (lastPlayedCard.getColor() == card.getColor()))
+                        || ((lastPlayedCard.getType() == CardType.Wild) && (wildColor == card.getColor()))
+                        || ((lastPlayedCard.getType() == CardType.Draw2) && cardsStack.isEmpty() && (lastPlayedCard.getColor() == card.getColor()))
+                        || ((lastPlayedCard.getType() == CardType.WildDraw4) && cardsStack.isEmpty() && (wildColor == card.getColor()))) {
                     isPlayable = true;
                 }
 
@@ -83,7 +85,8 @@ public class Client {
                 if (lastPlayedCard.getType() == CardType.Draw2
                         || lastPlayedCard.getType() == CardType.WildDraw4
                         || ((lastPlayedCard.getType() == CardType.Wild) && (wildColor == card.getColor()))
-                        || ((lastPlayedCard.getType() == CardType.Number || lastPlayedCard.getType() == CardType.Skip || lastPlayedCard.getType() == CardType.Reverse)
+                        || ((lastPlayedCard.getType() == CardType.Skip) && cardsStack.isEmpty() && (lastPlayedCard.getColor() == card.getColor()))
+                        || ((lastPlayedCard.getType() == CardType.Number || lastPlayedCard.getType() == CardType.Reverse)
                             && (lastPlayedCard.getColor() == card.getColor()))) {
                     isPlayable = true;
                 }
@@ -365,14 +368,7 @@ public class Client {
                                         this.playerTurn = message.getOpponent();
                                         // Update in GUI
 
-                                        for (int i = 0; i < opponents.size(); i++) {
-                                            if (opponents.get(i).getId() == player.getID()) {
-                                                opponent = opponents.get(i);
-                                                break;
-                                            }
-                                        }
-
-                                        if (opponent.getId() == player.getID() && opponent.getLeftSkipTurns() > 0) {
+                                        if (playerTurn.getId() == player.getID() && playerTurn.getLeftSkipTurns() > 0) {
                                             skipTurn();
                                         } else {
                                             ClientController.setPlayerTurn(playerTurn.getUsername(), (playerTurn.getId() == player.getID()));
@@ -459,6 +455,7 @@ public class Client {
 
                                     case STOP_GAME:
                                         // TODO
+                                        gameStarted = false;
                                         break;
                                 }
                                 break;

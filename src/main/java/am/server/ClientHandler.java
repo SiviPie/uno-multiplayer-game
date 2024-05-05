@@ -620,7 +620,9 @@ public class ClientHandler extends Thread {
                                         // Check what type of war it was
                                         if (cardsStack.getFirst().getType() == CardType.Skip) {
                                             System.out.println("[ClientHandler]: Set player " + cardsStack.size() + " skips");
-                                            player.setLeftSkipTurns(cardsStack.size());
+                                            player.setLeftSkipTurns(cardsStack.size() - 1);
+
+                                            updateOpponent();
 
                                             broadcastPlayerSkipTurns(opponent);
 
@@ -697,7 +699,7 @@ public class ClientHandler extends Thread {
 
                                     // Check if player said uno when they had 2 cards
                                     if (player.getCards().getSize() == 1) {
-                                        if (message.getSaidUno() == true) {
+                                        if (message.getSaidUno()) {
                                             broadcastTextMessageFromServer(player.getUsername() + " said UNO!");
                                         } else {
                                             broadcastTextMessageFromServer(player.getUsername() + " forgot to say UNO! +4 cards punishment.");
@@ -757,7 +759,7 @@ public class ClientHandler extends Thread {
                                 case SKIP_TURN:
                                     player.setLeftSkipTurns(player.getLeftSkipTurns() - 1);
 
-                                    opponent.setPlayerAsOpponent(player);
+                                    updateOpponent();
 
                                     broadcastPlayerSkipTurns(opponent);
 
