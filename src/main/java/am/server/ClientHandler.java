@@ -21,8 +21,6 @@ public class ClientHandler extends Thread {
     private ObjectInputStream inputStream = null;
     private ObjectOutputStream outputStream;
 
-    Label numberOfConnectionsLabel;
-
     protected static final ArrayList<ClientHandler> clients = new ArrayList<ClientHandler>();
 
     // Player variables
@@ -41,6 +39,9 @@ public class ClientHandler extends Thread {
     // Flags
     Boolean isConnected;
     Boolean closedByServer = false;
+
+    // LABELS
+    Label numberOfConnectionsLabel;
 
     public ClientHandler(Socket clientSocket, Label numberOfConnectionsLabel) {
         this.clientSocket = clientSocket;

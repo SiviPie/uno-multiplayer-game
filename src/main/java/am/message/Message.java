@@ -91,9 +91,6 @@ public class Message implements Serializable {
     }
 
     // SETTERS
-    public void setType(MessageType type) {
-        this.type = type;
-    }
 
     public void setSender(String sender) {
         this.sender = sender;

@@ -5,7 +5,7 @@ import java.io.Serializable;
 
 public class Card implements Serializable {
     @Serial
-    private static final long serialVersionUID = 3L;
+    private static final long serialVersionUID = 1L;
 
     CardType type;
     Color color;

@@ -11,10 +11,15 @@ target/
 *.iws
 *.iml
 *.ipr
+
 out/
 target/
+.mvn/
+.idea/
 pom.xml
 mvnw*
+mvnw
+mvnw.cmd
 
 ### Eclipse ###
 .apt_generated

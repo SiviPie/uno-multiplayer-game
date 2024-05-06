@@ -1,6 +1,5 @@
 package am.uno;
 
-import java.util.ArrayList;
 import java.util.Random;
 
 public class Game {

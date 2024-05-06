@@ -133,7 +133,7 @@ public class ClientController implements GameController.WindowCloseListener, Ini
         vbox.setSpacing(10);
 
         // Create the Image for the profile picture
-        Image pfpImage = new Image(Objects.requireNonNull(ClientController.class.getResourceAsStream("/am/client/cats/cat" + player.getImageId() + ".jpeg")));
+        Image pfpImage = new Image(Objects.requireNonNull(ClientController.class.getResourceAsStream("/am/client/img/cats/cat" + player.getImageId() + ".jpeg")));
         ImageView pfpImageView = new ImageView(pfpImage);
 
         // Set image dimensions
@@ -156,7 +156,7 @@ public class ClientController implements GameController.WindowCloseListener, Ini
         hbox.setAlignment(Pos.CENTER);
 
         // Create the card image
-        Image cardsImage = new Image(Objects.requireNonNull(ClientController.class.getResourceAsStream("/am/client/img/Deck.png")));
+        Image cardsImage = new Image(Objects.requireNonNull(ClientController.class.getResourceAsStream("/am/client/img/cards/Deck.png")));
         ImageView cardsImageView = new ImageView(cardsImage);
 
         // Set image dimensions
@@ -318,7 +318,7 @@ public class ClientController implements GameController.WindowCloseListener, Ini
 
     public static void addCard(Card card) {
         // Create Image object
-        Image image = new Image(Objects.requireNonNull(ClientController.class.getResourceAsStream("/am/client/img/" + card.getName() + ".png")));
+        Image image = new Image(Objects.requireNonNull(ClientController.class.getResourceAsStream("/am/client/img/cards/" + card.getName() + ".png")));
 
         // Create ImageViewWithCard object based on Image and Card
         ImageViewWithCard imageView = new ImageViewWithCard(card, image);
@@ -341,7 +341,7 @@ public class ClientController implements GameController.WindowCloseListener, Ini
 
     public static void setLastPlayedCard(Card card) {
         // Create Image object
-        Image image = new Image(Objects.requireNonNull(ClientController.class.getResourceAsStream("/am/client/img/" + card.getName() + ".png")));
+        Image image = new Image(Objects.requireNonNull(ClientController.class.getResourceAsStream("/am/client/img/cards/" + card.getName() + ".png")));
 
         // Create ImageViewWithCard object based on Image and Card
         ImageViewWithCard imageView = new ImageViewWithCard(card, image);
@@ -417,7 +417,7 @@ public class ClientController implements GameController.WindowCloseListener, Ini
 
     public static void addCardToStack(Card card) {
         // Create Image object
-        Image image = new Image(Objects.requireNonNull(ClientController.class.getResourceAsStream("/am/client/img/" + card.getName() + ".png")));
+        Image image = new Image(Objects.requireNonNull(ClientController.class.getResourceAsStream("/am/client/img/cards/" + card.getName() + ".png")));
 
         // Create ImageViewWithCard object based on Image and Card
         ImageViewWithCard imageView = new ImageViewWithCard(card, image);

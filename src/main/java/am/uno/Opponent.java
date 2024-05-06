@@ -1,9 +1,12 @@
 package am.uno;
 
+import java.io.Serial;
 import java.io.Serializable;
 
+// Opponents should not have access to player's cards
 public class Opponent implements Serializable {
-    // Opponents should not have access to player's cards
+    @Serial
+    private static final long serialVersionUID = 3L;
 
     String username;
     int id;
@@ -40,7 +43,9 @@ public class Opponent implements Serializable {
         this.num_cards = num_cards;
     }
 
-    public void setLeftSkipTurns(int leftSkipTurns) { this.leftSkipTurns = leftSkipTurns; }
+    public void setLeftSkipTurns(int leftSkipTurns) {
+        this.leftSkipTurns = leftSkipTurns;
+    }
 
     // GETTERS
     public int getId() {
@@ -59,5 +64,7 @@ public class Opponent implements Serializable {
         return this.num_cards;
     }
 
-    public int getLeftSkipTurns() { return this.leftSkipTurns; }
+    public int getLeftSkipTurns() {
+        return this.leftSkipTurns;
+    }
 }

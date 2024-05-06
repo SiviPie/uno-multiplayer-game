@@ -1,6 +1,5 @@
 package am.server;
 
-import am.message.GameUpdate;
 import am.uno.Card;
 import am.uno.CardType;
 import am.uno.Game;
@@ -134,6 +133,8 @@ public class Server {
 
         // If the card is Draw2, effects apply - let players know
         if (card.getType() == CardType.Draw2) {
+
+            ClientHandler.cardsStack.add(card);
             ClientHandler.broadcastAddCardToStack(card);
         }
 

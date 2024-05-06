@@ -3,7 +3,6 @@ package am.client;
 import am.uno.CardType;
 import am.uno.Color;
 import javafx.fxml.FXML;
-import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
@@ -15,7 +14,6 @@ import javafx.scene.shape.SVGPath;
 import javafx.stage.Stage;
 
 import java.io.IOException;
-import java.util.ArrayList;
 
 public class GameController {
 

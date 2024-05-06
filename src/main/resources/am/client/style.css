@@ -1,3 +1,5 @@
+/*** BUTTONS ***/
+
 #playButton {
 	-fx-background-color: #69c28d;
 }
@@ -75,4 +77,47 @@
 
 #disconnectButton:hover {
 	-fx-background-color:  #e04c4c;
+}
+
+
+/*** SCROLLPANE ***/
+
+.scroll-pane {
+    -fx-background-color: transparent;
+}
+
+.scroll-pane .viewport {
+    -fx-background-color: transparent;
+}
+
+.scroll-pane .viewport .anchor-pane {
+    -fx-background-color:  #4ae89c; 
+}
+
+.scroll-pane .scroll-bar:vertical {
+    -fx-background-color: white;
+    -fx-background-radius: 5px; 
+}
+
+.scroll-pane .scroll-bar:vertical .thumb {
+    -fx-background-color:   #5e60ce; 
+    -fx-background-insets: 2px, 2px, 2px, 2px;
+    -fx-background-radius: 5px; 
+}
+
+.scroll-pane .scroll-bar:vertical .increment-button,
+.scroll-pane .scroll-bar:vertical .decrement-button {
+    -fx-background-color: transparent;
+    -fx-background-insets: 0px; 
+}
+
+.scroll-pane .scroll-bar:vertical .increment-button,
+.scroll-pane .scroll-bar:vertical .decrement-button {
+    -fx-padding: 3px; 
+}
+
+/*** SPLITPANE ***/
+
+.split-pane > .split-pane-divider {
+    -fx-color:    #52489C;
 }
