@@ -20,6 +20,9 @@ pom.xml
 mvnw*
 mvnw
 mvnw.cmd
+src/main/resources/META-INF/
+src/main/resources/server/
+src/main/resources/client/
 
 ### Eclipse ###
 .apt_generated
