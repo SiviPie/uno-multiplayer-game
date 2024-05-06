@@ -3,10 +3,10 @@ package am.uno;
 import java.io.Serializable;
 
 public class Opponent implements Serializable {
-    // Opponents should not have access to my player data
+    // Opponents should not have access to player's cards
 
-    int id;
     String username;
+    int id;
     int num_cards;
     int imageId;
     int leftSkipTurns;

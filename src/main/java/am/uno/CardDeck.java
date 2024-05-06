@@ -10,19 +10,29 @@ public class CardDeck implements Serializable {
 
     private ArrayList<Card> cards;
 
+    /*** CONSTRUCTOR ***/
+
     public CardDeck() {
         cards = new ArrayList<Card>();
     }
 
-    public void addCard(Card card) {
-        this.cards.add(card);
+    /*** GETTERS ***/
+
+    public Card getCard(int index) {
+        return this.cards.get(index);
     }
 
-    public void populate() {
+    public int getSize() {
+        return this.cards.size();
+    }
 
+    /*** OTHER METHODS ***/
+
+    public void populate() {
         for (Color color : Color.values()) {
 
-            // add Number cards - 19 number cards (1 zero and 2 each of one through nine)
+            // add Number cards - 19 number cards (1 x zero and 2 x one->nine)
+
             // add 1 zero card
             this.addCard(new Card(CardType.Number, color, 0));
 
@@ -56,12 +66,8 @@ public class CardDeck implements Serializable {
         }
     }
 
-    public Card getCard(int index) {
-        return this.cards.get(index);
-    }
-
-    public int getSize() {
-        return this.cards.size();
+    public void addCard(Card card) {
+        this.cards.add(card);
     }
 
     public void removeCardByName(Card card) {
@@ -71,16 +77,5 @@ public class CardDeck implements Serializable {
                 break;
             }
         }
-
-    }
-
-    public void printCards() {
-        for (Card card : cards) {
-            card.showInfo();
-        }
-    }
-
-    public void printNumberOfCards() {
-        System.out.println(cards.size());
     }
 }

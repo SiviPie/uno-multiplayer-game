@@ -31,91 +31,100 @@ public class ServerController  implements Initializable {
     @FXML
     private Button startGameButton;
 
+    // Server object
     private Server server;
 
+    // Status variable
     private Boolean serverStarted = false;
 
     @FXML
     protected void startServerButtonClick() {
-
         try {
+            // Get the port from the port text field
             int port = Integer.parseInt(portTextField.getText());
+
+            // Create a new Server object and store it
             server = new Server(port);
 
+            // Start listening for clients
             server.startListening(numberOfConnectionsLabel);
 
+            // Update status variable
             serverStarted = true;
 
+            // Update status label in GUI
             serverStatusLabel.setText("Server started on port " + port);
 
-            // CREATE GAME
+            // Create a new game
             server.setGame(new Game());
 
-            // make start button inactive
+            // Make start server button inactive
             startServerButton.setDisable(true);
-            // make stopButton active
+            // Make stop server button active
             stopServerButton.setDisable(false);
-
-            // make client interraction buttons active
-            greetPlayersButton.setDisable(false);
+            // Make start game button active
             startGameButton.setDisable(false);
+            // Make greet players button active
+            greetPlayersButton.setDisable(false);
 
-            // make startButton inactive
-            startServerButton.setDisable(true);
-
-            // Set status in gui
+            // Set status in GUI
             serverStatusLabel.setText("Server started!");
-
-            // You can start the game or perform any other action with intValue
         } catch (NumberFormatException e) {
-            // Handle the case when the text cannot be parsed to an integer
-            System.out.println("Invalid input. Please enter a valid integer for port.");
-            serverStatusLabel.setText("Invalid input.");
+            System.out.println("[ServerController]: Invalid input. Please enter a valid integer for port.");
+            serverStatusLabel.setText("Invalid port.");
         }
-
     }
 
     @FXML
     private void stopServerButtonClick() {
+        // Close the connections
         server.closeServer(numberOfConnectionsLabel);
 
         serverStarted = false;
 
-        // make stopButton inactive
+        server.setGameStarted(false);
+
+        // Make stop button inactive
         stopServerButton.setDisable(true);
-
-        // make client interraction buttons inactive
-        greetPlayersButton.setDisable(true);
-        startGameButton.setDisable(true);
-
-        // make startButton active
+        // make start server button active
         startServerButton.setDisable(false);
+        // Make start game button inactive
+        startGameButton.setDisable(true);
+        // Make greet players button inactive
+        greetPlayersButton.setDisable(true);
 
-        // update server status label
+        // Update server status label
         serverStatusLabel.setText("Server closed!");
     }
 
     @FXML
     private void greetPlayersButtonClick() {
+        // Send greetings to all the clients
         server.broadcastTextMessage("Hello!");
-        System.out.println("[Server]: Greeted clients");
+
+        System.out.println("[ServerController]: Greeted clients");
     }
 
     @FXML
     private void startGameButtonClick() {
+        // Start game only if there are at least 2 players
         if (ClientHandler.clients.size() < 2) {
-            System.out.println("Now enough players to start the game.");
+            System.out.println("[ServerController]: Not enough players to start the game.");
             return;
         }
 
         server.setGameStarted(true);
+
+        // Set the cards
         server.setFirstCard();
         server.giveCardsToPlayers();
+
+        // Start the turn
         server.setFirstPlayerTurn();
 
         startGameButton.setDisable(true);
 
-        System.out.println("GAME started!");
+        System.out.println("[ServerController]: Game started!");
     }
 
     @Override
@@ -126,7 +135,7 @@ public class ServerController  implements Initializable {
                     startServerButtonClick();
                 }
             } else {
-                System.out.println("Server already started.");
+                System.out.println("[ServerController]: Server already started.");
             }
         });
     }

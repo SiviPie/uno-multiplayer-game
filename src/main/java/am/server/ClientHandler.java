@@ -15,29 +15,32 @@ import java.util.ArrayList;
 import java.util.Random;
 
 public class ClientHandler extends Thread {
+    // Connection variables
     private final Socket clientSocket;
-    protected static final ArrayList<ClientHandler> clients = new ArrayList<ClientHandler>();
 
     private ObjectInputStream inputStream = null;
     private ObjectOutputStream outputStream;
 
+    Label numberOfConnectionsLabel;
+
+    protected static final ArrayList<ClientHandler> clients = new ArrayList<ClientHandler>();
+
+    // Player variables
     protected Player player;
-    Opponent opponent;// opponent view, seen by others
+    Opponent opponent;// opponent view of this client's player, as seen by others
     protected static ArrayList<Opponent> opponents = new ArrayList<Opponent>();
     protected static Opponent playerTurn;
 
-    private static int last_id = 0;
-
-    private static boolean direction = true;
-
+    // Game variables
+    Card lastPlayedCard;
     protected static ArrayList<Card> cardsStack = new ArrayList<>();
 
-    Label numberOfConnectionsLabel;
+    private static boolean direction = true;
+    private static int last_id = 0; // Last ID assigned to a player from all connected players
 
+    // Flags
     Boolean isConnected;
     Boolean closedByServer = false;
-
-    Card lastPlayedCard;
 
     public ClientHandler(Socket clientSocket, Label numberOfConnectionsLabel) {
         this.clientSocket = clientSocket;
@@ -58,14 +61,17 @@ public class ClientHandler extends Thread {
     public void sendTextMessageToClient(String username, String text)  {
         try {
             if (outputStream == null && this.isConnected) {
-                // Handle or log the NullPointerException
-                System.err.println("Output stream is null");
+                // Log the NullPointerException
+                System.err.println("[ClientHandler]: Output stream is null");
                 return;
             }
+
+            // Create the Message object
             Message message = new Message(MessageType.TEXT);
             message.setSender(username);
             message.setText(text);
 
+            // Send the message
             outputStream.writeObject(message);
 
             System.out.println("[ClientHandler]: Sent TEXT message: " + text);
@@ -78,13 +84,16 @@ public class ClientHandler extends Thread {
     public void sendPlayerToClient(Player player) {
         try {
             if (outputStream == null) {
-                // Handle or log the NullPointerException
+                // Log the NullPointerException
                 System.err.println("Output stream is null");
                 return;
             }
+
+            // Create the Message object
             Message message = new Message(MessageType.INIT);
             message.setPlayer(player);
 
+            // Send the message
             outputStream.writeObject(message);
 
             System.out.println("[ClientHandler]: Sent Player object");
@@ -97,14 +106,17 @@ public class ClientHandler extends Thread {
     public void sendOpponentListToClient() {
         try {
             if (outputStream == null) {
-                // Handle or log the NullPointerException
+                // Log the NullPointerException
                 System.err.println("Output stream is null");
                 return;
             }
+
+            // Create the Message object
             Message message = new Message(MessageType.GAME_UPDATE);
             message.setGameUpdate(GameUpdate.PLAYER_LIST_INIT);
             message.setOpponents(opponents);
 
+            // Send the message
             outputStream.writeObject(message);
 
             System.out.println("[ClientHandler]: Sent opponent list containing " + message.getOpponents().size() + " players to client.");
@@ -117,13 +129,17 @@ public class ClientHandler extends Thread {
     public void sendOpponentToClient(Opponent opponent, GameUpdate gameUpdate) {
         try {
             if (outputStream == null) {
-                // Handle or log the NullPointerException
+                // Log the NullPointerException
                 System.err.println("Output stream is null");
                 return;
             }
+
+            // Create the Message object
             Message message = new Message(MessageType.GAME_UPDATE);
             message.setGameUpdate(gameUpdate);
             message.setOpponent(opponent);
+
+            // Send the message
             outputStream.writeObject(message);
 
             System.out.println("[ClientHandler]: Sent opponent " + opponent.getUsername() + " to client.");
@@ -136,15 +152,17 @@ public class ClientHandler extends Thread {
     public void sendCardToClient(Card card) {
         try {
             if (outputStream == null) {
-                // Handle or log the NullPointerException
+                // Log the NullPointerException
                 System.err.println("Output stream is null");
                 return;
             }
 
+            // Create the Message object
             Message message = new Message(MessageType.GAME_UPDATE);
             message.setGameUpdate(GameUpdate.CARD_ADD);
             message.setCard(card);
 
+            // Send the message
             outputStream.writeObject(message);
 
             System.out.println("[ClientHandler]: Sent card " + card.getName() + " to client.");
@@ -157,15 +175,17 @@ public class ClientHandler extends Thread {
     public void sendFirstPlayedCard(Card card) {
         try {
             if (outputStream == null) {
-                // Handle or log the NullPointerException
+                // Log the NullPointerException
                 System.err.println("Output stream is null");
                 return;
             }
 
+            // Create the Message object
             Message message = new Message(MessageType.GAME_UPDATE);
             message.setGameUpdate(GameUpdate.FIRST_CARD);
             message.setCard(card);
 
+            // Send the message
             outputStream.writeObject(message);
 
             System.out.println("[ClientHandler]: Sent FIRST_CARD " + card.getName() + " to client");
@@ -178,20 +198,19 @@ public class ClientHandler extends Thread {
     public void sendLastPlayedCard(Card card, Opponent player) {
         try {
             if (outputStream == null) {
-                // Handle or log the NullPointerException
+                // Log the NullPointerException
                 System.err.println("Output stream is null");
                 return;
             }
 
+            // Create the Message object
             Message message = new Message(MessageType.GAME_CHOICE);
             message.setGameChoice(GameChoice.PLAY_CARD);
-
             message.setCard(card);
-
             message.setIdPlayerToUpdate(player.getId());
             message.setNum(player.getNum_cards());
 
-
+            // Send the message
             outputStream.writeObject(message);
 
             System.out.println("[ClientHandler]: Sent PLAY_CARD " + card.getName() + " to client. Also opponent has " + player.getNum_cards() + " cards");
@@ -204,15 +223,17 @@ public class ClientHandler extends Thread {
     public void sendCardToStack(Card card) {
         try {
             if (outputStream == null) {
-                // Handle or log the NullPointerException
+                // Log the NullPointerException
                 System.err.println("Output stream is null");
                 return;
             }
 
+            // Create the Message object
             Message message = new Message(MessageType.GAME_UPDATE);
             message.setGameUpdate(GameUpdate.CARDS_STACK_ADD);
             message.setCard(card);
 
+            // Send the message
             outputStream.writeObject(message);
 
             System.out.println("[ClientHandler]: Sent CLEAR_CARD message");
@@ -225,14 +246,16 @@ public class ClientHandler extends Thread {
     public void clearCardsStack() {
         try {
             if (outputStream == null) {
-                // Handle or log the NullPointerException
+                // Log the NullPointerException
                 System.err.println("Output stream is null");
                 return;
             }
 
+            // Create the Message object
             Message message = new Message(MessageType.GAME_UPDATE);
             message.setGameUpdate(GameUpdate.CARDS_STACK_CLEAR);
 
+            // Send the message
             outputStream.writeObject(message);
 
             System.out.println("[ClientHandler]: Sent CLEAR_CARD message");
@@ -255,6 +278,7 @@ public class ClientHandler extends Thread {
     }
 
     public void updateOpponent() {
+        // Update client's opponent object with player data
         this.opponent.setPlayerAsOpponent(player);
     }
 
@@ -267,21 +291,19 @@ public class ClientHandler extends Thread {
     public void sendPlayerCardsNumber(Opponent player) {
         try {
             if (outputStream == null) {
-                // Handle or log the NullPointerException
+                // Log the NullPointerException
                 System.err.println("Output stream is null");
                 return;
             }
 
+            // Create Message object
             Message message = new Message(MessageType.GAME_UPDATE);
             message.setGameUpdate(GameUpdate.PLAYER_CARDS_UPDATE);
-
             message.setIdPlayerToUpdate(player.getId());
             message.setNum(player.getNum_cards());
 
-            System.out.println("[CLIENTHANDLER]: sent id " + player.getId() + "  " + player.getNum_cards() + " cards");
-
+            // Send the message
             outputStream.writeObject(message);
-
 
             System.out.println("[ClientHandler]: Sent PLAYER_CARDS_UPDATE for all players.");
 
@@ -293,21 +315,19 @@ public class ClientHandler extends Thread {
     private void sendPlayerSkipTurns(Opponent opponent) {
         try {
             if (outputStream == null) {
-                // Handle or log the NullPointerException
+                // Log the NullPointerException
                 System.err.println("Output stream is null");
                 return;
             }
 
+            // Create the Message object
             Message message = new Message(MessageType.GAME_UPDATE);
             message.setGameUpdate(GameUpdate.PLAYER_SKIP_TURNS);
-
             message.setIdPlayerToUpdate(opponent.getId());
             message.setNum(opponent.getLeftSkipTurns());
 
-            System.out.println("[CLIENTHANDLER]: sent id " + opponent.getId() + "  " + opponent.getLeftSkipTurns() + " skip turns");
-
+            // Send the message
             outputStream.writeObject(message);
-
 
             System.out.println("[ClientHandler]: Sent PLAYER_CARDS_UPDATE for all players.");
 
@@ -319,25 +339,26 @@ public class ClientHandler extends Thread {
     public void sendAllPlayersCardsNumber() {
         try {
             if (outputStream == null) {
-                // Handle or log the NullPointerException
+                // Log the NullPointerException
                 System.err.println("Output stream is null");
                 return;
             }
 
+            // Create and broadcast message
             for (Opponent player : opponents) {
+                // Create the Message object
                 Message message = new Message(MessageType.GAME_UPDATE);
                 message.setGameUpdate(GameUpdate.PLAYER_CARDS_UPDATE);
-
                 message.setIdPlayerToUpdate(player.getId());
                 message.setNum(player.getNum_cards());
 
-                System.out.println("[CLIENTHANDLER]: sent id " + player.getId() + "  " + player.getNum_cards() + " cards");
-
+                // Send the message
                 outputStream.writeObject(message);
+
+                System.out.println("[CLIENTHANDLER]: sent id " + player.getId() + "  " + player.getNum_cards() + " cards");
             }
 
             System.out.println("[ClientHandler]: Sent PLAYER_CARDS_UPDATE for all players.");
-
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -351,14 +372,15 @@ public class ClientHandler extends Thread {
                 return;
             }
 
+            // Create the Message object
             Message message = new Message(MessageType.GAME_UPDATE);
             message.setGameUpdate(GameUpdate.WILD_COLOR_SET);
             message.setColor(color);
 
+            // Send the message
             outputStream.writeObject(message);
 
             System.out.println("[CLIENTHANDLER]: sent WILD_COLOR_SET message");
-
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -372,13 +394,14 @@ public class ClientHandler extends Thread {
                 return;
             }
 
+            // Create the Message object
             Message message = new Message(MessageType.GAME_UPDATE);
             message.setGameUpdate(GameUpdate.WILD_COLOR_CLEAR);
 
+            // Send the message
             outputStream.writeObject(message);
 
             System.out.println("[CLIENTHANDLER]: sent WILD_COLOR_CLEAR message");
-
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -391,14 +414,15 @@ public class ClientHandler extends Thread {
                 return;
             }
 
+            // Create the Message object
             Message message = new Message(MessageType.GAME_UPDATE);
             message.setGameUpdate(GameUpdate.DIRECTION_CHANGE);
             message.setDirection(direction);
 
+            // Send the message
             outputStream.writeObject(message);
 
             System.out.println("[CLIENTHANDLER]: sent DIRECTION_CHANGE message");
-
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -411,9 +435,11 @@ public class ClientHandler extends Thread {
                 return;
             }
 
+            // Create Message object
             Message message = new Message(MessageType.GAME_UPDATE);
             message.setGameUpdate(GameUpdate.STOP_GAME);
 
+            // Send the message
             outputStream.writeObject(message);
 
             System.out.println("[CLIENTHANDLER]: sent DIRECTION_CHANGE message");
@@ -431,23 +457,26 @@ public class ClientHandler extends Thread {
                 return;
             }
 
+            // Create Message object
             Message message = new Message(MessageType.SERVER_SHUTDOWN);
             message.setSender("Server");
 
+            // Send the message
             outputStream.writeObject(message);
 
             System.out.println("[ClientHandler]: Sent SERVER_SHUTDOWN message: ");
 
+            // Set the flag
             this.closedByServer = true;
+
+            // Close connections
             this.close();
 
         } catch (IOException e) {
             throw new RuntimeException(e);
         } catch (IllegalStateException e) {
-            // Handle or log the IllegalStateException
             e.printStackTrace();
         } catch (SecurityException e) {
-            // Handle or log the SecurityException
             e.printStackTrace();
         }
     }
@@ -503,6 +532,12 @@ public class ClientHandler extends Thread {
         }
     }
 
+    public static void broadcastSendFirstPlayedCard(Card card) {
+        for (ClientHandler client : clients) {
+            client.sendFirstPlayedCard(card);
+        }
+    }
+
     public static void broadcastPlayerCardsNumber(Opponent opponent) {
         for (ClientHandler client : clients) {
             client.sendPlayerCardsNumber(opponent);
@@ -554,6 +589,8 @@ public class ClientHandler extends Thread {
     public void run() {
         try {
             this.inputStream = new ObjectInputStream(clientSocket.getInputStream());
+
+            // Auxiliary variables
             Message message;
             Card card;
 
@@ -567,16 +604,18 @@ public class ClientHandler extends Thread {
                         break;
                     }
 
+                    // Get the message
                     message = (Message) inputStream.readObject();
 
+                    // Auxiliary variables
                     int cardsToDraw;
                     int index;
 
                     switch (message.getType()) {
-
                         case TEXT:
                             System.out.println("[ClientHandler]: Received TEXT: " + message.getText());
                             broadcastTextMessageFromClient(message.getText(), this);
+
                             break;
 
                         case INIT:
@@ -592,20 +631,20 @@ public class ClientHandler extends Thread {
                             player = new Player(username, last_id, randomNumber);
                             last_id++;
 
-                            // SEND Player to client
+                            // Send Player to client
                             sendPlayerToClient(player);
 
+                            // Create opponent object and add to list
                             opponent = new Opponent(player);
-
                             opponents.add(opponent);
 
                             // Greet player
                             this.sendTextMessageToClient("server", "Welcome to the server, " + player.getUsername() + "!");
 
-                            // TODO: send list of players to this player
+                            // Send list of already existing players to this player
                             this.sendOpponentListToClient();
 
-                            // TODO: notify the others that player joined
+                            // Notify the other players that player joined
                             broadcastTextMessageFromServerExcept(username + " connected to the server!", this);
                             broadcastNewOpponentToOtherPlayers(opponent, this);
 
@@ -614,12 +653,13 @@ public class ClientHandler extends Thread {
                         case GAME_CHOICE:
                             switch (message.getGameChoice()) {
                                 case DRAW_CARD:
-
                                     // Check if the stacked cards apply to player
                                     if (!cardsStack.isEmpty()) {
-                                        // Check what type of war it was
+                                        // Check what type of stack it was
                                         if (cardsStack.getFirst().getType() == CardType.Skip) {
                                             System.out.println("[ClientHandler]: Set player " + cardsStack.size() + " skips");
+
+                                            // Substract a skip turn from player
                                             player.setLeftSkipTurns(cardsStack.size() - 1);
 
                                             updateOpponent();
@@ -670,7 +710,6 @@ public class ClientHandler extends Thread {
                                     // Broadcast new cards number for this player
                                     broadcastPlayerCardsNumber(opponent);
 
-
                                     // Go to the next player
                                     if (direction) {
                                         playerTurn = opponents.get((opponents.indexOf(playerTurn) + 1) % opponents.size());
@@ -689,13 +728,6 @@ public class ClientHandler extends Thread {
                                     lastPlayedCard = message.getCard();
 
                                     player.popCard(lastPlayedCard);
-
-                                    // Check if player won
-                                    if (player.getCards().getSize() == 0) {
-                                        broadcastTextMessageFromServer("Congrats! " + player.getUsername() + " won the game!");
-                                        broadcastStopGame();
-                                        break;
-                                    }
 
                                     // Check if player said uno when they had 2 cards
                                     if (player.getCards().getSize() == 1) {
@@ -739,6 +771,13 @@ public class ClientHandler extends Thread {
                                         broadcastAddCardToStack(lastPlayedCard);
                                     } else {
                                         Server.game.addCard(lastPlayedCard);
+                                    }
+
+                                    // Check if player won
+                                    if (player.getCards().getSize() == 0) {
+                                        broadcastTextMessageFromServer("Congrats! " + player.getUsername() + " won the game!");
+                                        broadcastStopGame();
+                                        break;
                                     }
 
                                     // Go to the next player
@@ -790,13 +829,13 @@ public class ClientHandler extends Thread {
                             break;
                     }
                 } catch (EOFException eof) {
-                    // Handle client disconnection
+                    // Exit the loop when client disconnects
                     System.out.println("[ClientHandler]: Client disconnected");
-                    break; // Exit the loop when client disconnects
+                    break;
                 } catch (SocketException se) {
-                    // Handle socket closed
+                    // Exit the loop when socket is closed
                     System.out.println("[ClientHandler]: Socket closed by client.");
-                    break; // Exit the loop when socket is closed
+                    break;
                 } catch (IOException | ClassNotFoundException e) {
                     throw new RuntimeException(e);
                 }
@@ -813,8 +852,6 @@ public class ClientHandler extends Thread {
             close();
         }
     }
-
-
 
     public void close() {
         try {
@@ -839,10 +876,9 @@ public class ClientHandler extends Thread {
 
             // Remove this client handler from the list
             clients.remove(this);
-            opponents.remove(opponent);  // DO I HAVE TO ???????
+            opponents.remove(opponent);
 
             // Notify all the remaining clients of the departure
-
             updateNumberOfConnectionsLabel(numberOfConnectionsLabel);
 
         } catch (IOException e) {

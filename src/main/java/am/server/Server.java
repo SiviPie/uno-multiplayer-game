@@ -17,15 +17,16 @@ import java.util.TimerTask;
 
 
 public class Server {
+    // Connection variables
     private ServerSocket serverSocket;
 
-    private boolean isRunning = true;
-
-    private boolean gameStarted = false;
-
-    protected static Game game;
-
+    // Timer used to scan for connections
     Timer timer;
+
+    // Game variables
+    protected static Game game;
+    private boolean isRunning = true;
+    private boolean gameStarted = false;
 
     public Server(int port) {
         try {
@@ -40,17 +41,27 @@ public class Server {
         new Thread(() -> {
             try {
                 while (true) {
-                    if (!isRunning || gameStarted) {
-                        break; // Check if server is closing before handling new client
+                    // Check if server is closing before handling new client
+                    if (!isRunning) {
+                        break;
                     }
-                    Socket clientSocket = serverSocket.accept(); // Accept incoming client connections
 
-                    ClientHandler clientHandler = new ClientHandler(clientSocket, numberOfConnectionsLabel);
+                    // Accept incoming client connections
+                    Socket clientSocket = serverSocket.accept();
 
-                    ClientHandler.clients.add(clientHandler);
+                    if (!gameStarted) {
+                        // Create ClientHandler object
+                        ClientHandler clientHandler = new ClientHandler(clientSocket, numberOfConnectionsLabel);
 
-                    updateNumberOfConnectionsLabel(numberOfConnectionsLabel);
-                    clientHandler.start(); // Start handling client in a separate thread
+                        // Add it to the list of clientHandlers
+                        ClientHandler.clients.add(clientHandler);
+
+                        // Update the number of connections label (GUI)
+                        updateNumberOfConnectionsLabel(numberOfConnectionsLabel);
+
+                        // Start handling client in a separate thread
+                        clientHandler.start();
+                    }
                 }
             } catch (SocketException se) {
                 // Socket closed, server is shutting down
@@ -63,26 +74,40 @@ public class Server {
 
         // Schedule a task to scan for client handlers every few seconds
         this.timer = new Timer();
+
         timer.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
                 scanForClientHandlers(numberOfConnectionsLabel);
             }
-        }, 0, 5000); // Scan every 5 seconds
+        }, 0, 10000); // Scan every 10 seconds
     }
 
     public void setGame(Game game) {
-        this.game = game;
+        Server.game = game;
+    }
+
+    public void setGameStarted(Boolean gameStarted) {
+        this.gameStarted = gameStarted;
     }
 
     private void scanForClientHandlers(Label numberOfConnectionsLabel) {
         updateNumberOfConnectionsLabel(numberOfConnectionsLabel);
     }
 
+    public void setFirstPlayerTurn() {
+        ClientHandler.playerTurn = ClientHandler.opponents.getFirst();
+
+        ClientHandler.broadcastPlayerTurn();
+    }
+
     public void giveCardsToPlayers() {
+        // Give 5 cards to each player
         for (int i = 0; i < 5; i++) {
             for (ClientHandler client : ClientHandler.clients) {
+                // Pop card from game's card deck
                 Card card = game.popRandomCard();
+
                 // Add card to player info
                 client.player.addCard(card);
 
@@ -96,10 +121,10 @@ public class Server {
     }
 
     public void setFirstCard() {
-
+        // Pop card from game's card deck
         Card card = game.popRandomCard();
 
-        // Check if card is WILD
+        // Check if card is WILD or DRAW, and if it is, discard it
         while ((card.getType() == CardType.Wild) || (card.getType() == CardType.WildDraw4)) {
             // Add card back to pile
             game.addCard(card);
@@ -107,11 +132,13 @@ public class Server {
             card = game.popRandomCard();
         }
 
-        // TODO: Handle Draw2
-
-        for (ClientHandler client : ClientHandler.clients) {
-            client.sendFirstPlayedCard(card);
+        // If the card is Draw2, effects apply - let players know
+        if (card.getType() == CardType.Draw2) {
+            ClientHandler.broadcastAddCardToStack(card);
         }
+
+        // Send the card to the players
+        ClientHandler.broadcastSendFirstPlayedCard(card);
     }
 
     public void broadcastAllPlayersCardsNumber() {
@@ -127,28 +154,29 @@ public class Server {
         Platform.runLater(() -> numberOfConnectionsLabel.setText(String.valueOf(ClientHandler.clients.size())));
     }
 
-    public void setGameStarted(Boolean gameStarted) {
-        this.gameStarted = gameStarted;
-    }
-
     public void closeServer(Label numberOfConnectionsLabel) {
-        isRunning = false; // Set the flag to stop accepting new clients
+        // Set the flag to stop accepting new clients
+        isRunning = false;
 
+        // Cancel the timer task
         if (this.timer != null) {
-            this.timer.cancel(); // Cancel the timer task
+            this.timer.cancel();
         }
 
         try {
             System.out.println("[Server]: Closing client by client");
 
+            // Close all client connections
             while (!ClientHandler.clients.isEmpty()) {
                 closeOneConnection(numberOfConnectionsLabel);
             }
 
+            // Close the server socket to interrupt accept()
             if (serverSocket != null) {
-                serverSocket.close(); // Close the server socket to interrupt accept()
+                serverSocket.close();
             }
 
+            // Update number of connections in GUI
             updateNumberOfConnectionsLabel(numberOfConnectionsLabel);
 
             System.out.println("[Server]: Server closed!");
@@ -159,21 +187,18 @@ public class Server {
     }
 
     public void closeOneConnection(Label numberOfConnectionsLabel) throws IOException {
+        // Check if clients list is empty - if it is, abort
         if (ClientHandler.clients.isEmpty()) {
             System.out.println("[Server]: Can't close connection, client list empty!");
             return;
         }
 
+        // Close the first connection in clients list
         ClientHandler client = ClientHandler.clients.getFirst();
         client.sendShutdownMessage();
 
+        // Update number of connections in GUI
         updateNumberOfConnectionsLabel(numberOfConnectionsLabel);
-    }
-
-    public void setFirstPlayerTurn() {
-        ClientHandler.playerTurn = ClientHandler.opponents.getFirst();
-
-        ClientHandler.broadcastPlayerTurn();
     }
 
 }

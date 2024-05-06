@@ -7,10 +7,10 @@ public class Player implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L; // ???
 
-    int id;
-    int imageId;
     String username;
     CardDeck cards;
+    int id;
+    int imageId;
     int leftSkipTurns; // Number of turns the player should skip
 
     public Player(String username, int id, int imageId) {
@@ -21,22 +21,12 @@ public class Player implements Serializable {
         leftSkipTurns = 0;
     }
 
-    public void addCard(Card card) {
-        cards.addCard(card);
-    }
-
-    public void showCardDeck() {
-        this.cards.printCards();
-        this.cards.printNumberOfCards();
-    }
-
-    public void popCard(Card card) {
-        this.cards.removeCardByName(card);
-    }
+    /*** SETTERS ***/
 
     public void setLeftSkipTurns(int leftSkipTurns) { this.leftSkipTurns = leftSkipTurns; }
 
-    // GETTER
+    /*** GETTERS ***/
+
     public String getUsername() {
         return this.username;
     }
@@ -57,5 +47,17 @@ public class Player implements Serializable {
         return this.cards.getSize();
     }
 
-    public int getLeftSkipTurns() { return this.leftSkipTurns; }
+    public int getLeftSkipTurns() {
+        return this.leftSkipTurns;
+    }
+
+    /*** OTHER METHODS ***/
+
+    public void addCard(Card card) {
+        cards.addCard(card);
+    }
+
+    public void popCard(Card card) {
+        this.cards.removeCardByName(card);
+    }
 }

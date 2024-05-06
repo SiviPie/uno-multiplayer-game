@@ -11,25 +11,27 @@ import java.net.SocketException;
 import java.util.ArrayList;
 
 public class Client {
+    // Connection variables
     private final Socket socket;
-
     private ObjectInputStream inputStream;
     private final ObjectOutputStream outputStream;
 
-    boolean gameStarted = false;
-
+    // Players info variables
     private final String username;
     protected Player player;
     private ArrayList<Opponent> opponents = new ArrayList<>();
-    private Opponent playerTurn;
+    private Opponent playerTurn; // Whose turn it is now
+    boolean saidUno = false;
 
-    private Card lastPlayedCard;
-    private ArrayList<Card> cardsStack = new ArrayList<>();
-    private boolean direction = true;
+    // Game variables
+    boolean gameStarted = false;
+    private Card lastPlayedCard = null;
+    private final ArrayList<Card> cardsStack = new ArrayList<>(); // history of cards that can be stacked
+                                                                  // skip, draw2, wilddraw4
+    private boolean direction = true; // true = left to right
+                                      // false = right to left
 
     private Color wildColor = null;
-
-    boolean saidUno = false;
 
     public Client(Socket socket, String username) throws IOException {
         this.socket = socket;
@@ -38,69 +40,61 @@ public class Client {
     }
 
     public boolean isCardPlayable(Card card) {
+        // Decide if we can select the card based on the card on the table
 
-        // TODO: also check if the last played card already applied to a previous player
+        // Check if game hasn't started yet
+        if (lastPlayedCard == null) {
+            return false;
+        }
 
         boolean isPlayable = false;
 
-
         switch (card.getType()) {
             case CardType.Number:
-                if ((lastPlayedCard.getType() == CardType.Number && (lastPlayedCard.getNumber() == card.getNumber() || lastPlayedCard.getColor() == card.getColor()))
+                isPlayable =  ((lastPlayedCard.getType() == CardType.Number && (lastPlayedCard.getNumber() == card.getNumber() || lastPlayedCard.getColor() == card.getColor()))
                         || ((lastPlayedCard.getType() == CardType.Skip) && cardsStack.isEmpty() && (lastPlayedCard.getColor() == card.getColor()))
                         || ((lastPlayedCard.getType() == CardType.Reverse) && (lastPlayedCard.getColor() == card.getColor()))
                         || ((lastPlayedCard.getType() == CardType.Wild) && (wildColor == card.getColor()))
                         || ((lastPlayedCard.getType() == CardType.Draw2) && cardsStack.isEmpty() && (lastPlayedCard.getColor() == card.getColor()))
-                        || ((lastPlayedCard.getType() == CardType.WildDraw4) && cardsStack.isEmpty() && (wildColor == card.getColor()))) {
-                    isPlayable = true;
-                }
+                        || ((lastPlayedCard.getType() == CardType.WildDraw4) && cardsStack.isEmpty() && (wildColor == card.getColor())));
 
                 break;
 
             case CardType.Skip:
-                if (lastPlayedCard.getType() == CardType.Skip
+                isPlayable = (lastPlayedCard.getType() == CardType.Skip
                         || ((lastPlayedCard.getType() == CardType.Number || lastPlayedCard.getType() == CardType.Reverse) && (lastPlayedCard.getColor() == card.getColor()))
                         || ((lastPlayedCard.getType() == CardType.Wild) && (wildColor == card.getColor()))
                         || ((lastPlayedCard.getType() == CardType.Draw2) && cardsStack.isEmpty() && (lastPlayedCard.getColor() == card.getColor()))
-                        || ((lastPlayedCard.getType() == CardType.WildDraw4) && cardsStack.isEmpty() && (wildColor == card.getColor()))) {
-                    isPlayable = true;
-                }
+                        || ((lastPlayedCard.getType() == CardType.WildDraw4) && cardsStack.isEmpty() && (wildColor == card.getColor())));
 
                 break;
 
             case CardType.Reverse:
-                if (lastPlayedCard.getType() == CardType.Reverse
+                isPlayable =  (lastPlayedCard.getType() == CardType.Reverse
                         || ((lastPlayedCard.getType() == CardType.Skip) && cardsStack.isEmpty() && (lastPlayedCard.getColor() == card.getColor()))
                         || ((lastPlayedCard.getType() == CardType.Number) && (lastPlayedCard.getColor() == card.getColor()))
                         || ((lastPlayedCard.getType() == CardType.Wild) && (wildColor == card.getColor()))
                         || ((lastPlayedCard.getType() == CardType.Draw2) && cardsStack.isEmpty() && (lastPlayedCard.getColor() == card.getColor()))
-                        || ((lastPlayedCard.getType() == CardType.WildDraw4) && cardsStack.isEmpty() && (wildColor == card.getColor()))) {
-                    isPlayable = true;
-                }
+                        || ((lastPlayedCard.getType() == CardType.WildDraw4) && cardsStack.isEmpty() && (wildColor == card.getColor())));
 
                 break;
 
             case CardType.Draw2:
-                // TODO: Also check if a war started
-                if (lastPlayedCard.getType() == CardType.Draw2
-                        || lastPlayedCard.getType() == CardType.WildDraw4
+                isPlayable = (lastPlayedCard.getType() == CardType.Draw2
+                        || (lastPlayedCard.getType() == CardType.WildDraw4 && (!cardsStack.isEmpty() || (wildColor == card.getColor())))
                         || ((lastPlayedCard.getType() == CardType.Wild) && (wildColor == card.getColor()))
                         || ((lastPlayedCard.getType() == CardType.Skip) && cardsStack.isEmpty() && (lastPlayedCard.getColor() == card.getColor()))
                         || ((lastPlayedCard.getType() == CardType.Number || lastPlayedCard.getType() == CardType.Reverse)
-                            && (lastPlayedCard.getColor() == card.getColor()))) {
-                    isPlayable = true;
-                }
+                            && (lastPlayedCard.getColor() == card.getColor())));
 
                 break;
 
             case CardType.Wild:
-                // TODO: only if it's not a war
                 isPlayable = cardsStack.isEmpty();
 
                 break;
 
             case CardType.WildDraw4:
-                // This one works on everything
                 isPlayable = true;
 
                 break;
@@ -109,83 +103,129 @@ public class Client {
         return isPlayable;
     }
 
-    public void sendTextMessage(String text) throws IOException {
-        Message message = new Message(MessageType.TEXT);
-        message.setSender(player.getUsername());
-        message.setText(text);
-
-        outputStream.writeObject(message);
-
-        System.out.println("[CLIENT]: Sent TEXT message: " + text);
-
-        ClientController.addTextMessageFromSelf(text, username);
-    }
-
     public void sendUsername() throws IOException {
-        Message message = new Message(MessageType.INIT);
-        message.setText(this.username);
+        // Send username to Server in order to be assigned a player
 
-        outputStream.writeObject(message);
+        try {
+            // Create Message object
+            Message message = new Message(MessageType.INIT);
+            message.setText(this.username);
 
-        System.out.println("[CLIENT]: Sent INIT message.");
+            // Send the message
+            outputStream.writeObject(message);
+
+            System.out.println("[CLIENT]: Sent INIT message.");
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
-    public void playCard(Card card, Color selectedColor) throws IOException {
+    public void sendTextMessage(String text) {
+        // Send text message to the other players
+
+        try {
+            // Create Message object
+            Message message = new Message(MessageType.TEXT);
+            message.setSender(player.getUsername());
+            message.setText(text);
+
+            // Send the message
+            outputStream.writeObject(message);
+
+            // Add to GUI
+            ClientController.addTextMessageFromSelf(text, username);
+
+            System.out.println("[CLIENT]: Sent TEXT message: " + text);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void playCard(Card card, Color selectedColor) {
+
         if (!gameStarted) {
             return;
         }
 
-        Message message = new Message(MessageType.GAME_CHOICE);
-        message.setGameChoice(GameChoice.PLAY_CARD);
-        message.setCard(card);
-        message.setSaidUno(saidUno);
+        try {
+            // Create Message object
+            Message message = new Message(MessageType.GAME_CHOICE);
+            message.setGameChoice(GameChoice.PLAY_CARD);
+            message.setCard(card);
+            message.setSaidUno(saidUno);
 
-        if (selectedColor != null) {
-            message.setColor(selectedColor);
+            // Handle Wild cards
+            if (selectedColor != null) {
+                message.setColor(selectedColor);
+            }
+
+            // Remove card from player's card deck
+            player.popCard(card);
+
+            // Send the message
+            outputStream.writeObject(message);
+
+            System.out.println("[CLIENT]: Sent PLAY_CARD message.");
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
-
-        player.popCard(card);
-
-        outputStream.writeObject(message);
-
-        System.out.println("[CLIENT]: Sent PLAY_CARD message.");
     }
 
-    public void drawCard() throws IOException {
+    public void drawCard() {
+
         if (!gameStarted) {
             return;
         }
 
-        Message message = new Message(MessageType.GAME_CHOICE);
-        message.setGameChoice(GameChoice.DRAW_CARD);
+        try {
+            // Create Message object
+            Message message = new Message(MessageType.GAME_CHOICE);
+            message.setGameChoice(GameChoice.DRAW_CARD);
 
-        outputStream.writeObject(message);
+            // Send the message
+            outputStream.writeObject(message);
 
-        System.out.println("[CLIENT]: Sent DRAW_CARD message.");
+            System.out.println("[CLIENT]: Sent DRAW_CARD message.");
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private void skipTurn() throws IOException {
+
         if (!gameStarted) {
             return;
         }
 
-        Message message = new Message(MessageType.GAME_CHOICE);
-        message.setGameChoice(GameChoice.SKIP_TURN);
+        try {
+            // Create message object
+            Message message = new Message(MessageType.GAME_CHOICE);
+            message.setGameChoice(GameChoice.SKIP_TURN);
 
-        outputStream.writeObject(message);
+            // Send the message
+            outputStream.writeObject(message);
 
-        System.out.println("[CLIENT]: Sent SKIP_TURN message.");
+            System.out.println("[CLIENT]: Sent SKIP_TURN message.");
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
-    public void sendDisconnectMessage() throws IOException {
-        Message message = new Message(MessageType.CLIENT_DISCONNECT);
-        message.setSender(player.getUsername());
+    public void sendDisconnectMessage() {
+        try {
+            // Create Message object
+            Message message = new Message(MessageType.CLIENT_DISCONNECT);
+            message.setSender(player.getUsername());
 
-        outputStream.writeObject(message);
+            // Send the message
+            outputStream.writeObject(message);
 
-        System.out.println("[CLIENT]: Sent DISCONNECT message.");
+            System.out.println("[CLIENT]: Sent DISCONNECT message.");
 
-        this.closeEverything();
+            this.closeEverything();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public void receiveMessageFromServer() {
@@ -193,28 +233,31 @@ public class Client {
             try {
                 inputStream = new ObjectInputStream(socket.getInputStream());
 
+                // Auxiliary variables
+                Message message;
                 Opponent opponent = null;
+                Card card;
                 int idOpponent;
                 int num;
-                Message message;
-
-                Card card;
 
                 while (socket.isConnected()) {
                     try {
+                        // Get message
                         message = (Message) inputStream.readObject();
+
                         switch (message.getType()) {
                             case TEXT:
-                                // Handle text message
-                                System.out.println("[CLIENT] Received TEXT message: " + message.getText());
-
-                                // Add the message to the scrollpane
+                                // Add to GUI
                                 ClientController.addTextMessageFromOthers(message.getSender(), message.getText());
+
+                                System.out.println("[CLIENT] Received TEXT message: " + message.getText());
                                 break;
 
                             case INIT:
+                                // Store the assigned Player object
                                 player = message.getPlayer();
-                                System.out.println("[CLIENT]: Received INIT Player object, I am " + player.getUsername() + " ID: " + player.getID());
+
+                                System.out.println("[CLIENT]: Received INIT Player object. I am " + player.getUsername() + " ID: " + player.getID());
                                 break;
 
                             case GAME_CHOICE:
@@ -222,21 +265,28 @@ public class Client {
 
                                 switch (message.getGameChoice()) {
                                     case DRAW_CARD:
+                                        // Get card from Server
                                         card = message.getCard();
 
+                                        // Add card to cards deck
                                         player.addCard(card);
 
+                                        // Add to GUI
                                         ClientController.addCard(card);
                                         break;
 
                                     case PLAY_CARD:
-
                                         System.out.println("[CLIENT] Received PLAY_ADD:");
+
+                                        // Update the card on the table
                                         lastPlayedCard = message.getCard();
 
+                                        // Get the id of the player who played the card
                                         idOpponent = message.getIdPlayerToUpdate();
+                                        // Get the number of cards that player has after playing the card
                                         num = message.getNum();
 
+                                        // Select the player from the opponents list
                                         for (int i = 0; i < opponents.size(); i++) {
                                             if (opponents.get(i).getId() == idOpponent) {
                                                 opponent = opponents.get(i);
@@ -246,19 +296,20 @@ public class Client {
                                             }
                                         }
 
+                                        // Make sure the getUsername() method doesn't throw a NullPointerException
                                         assert opponent != null;
-                                        System.out.println(opponent.getUsername() + " new cards: " + opponent.getNum_cards());
+
+                                        System.out.println("[CLIENT]: " + opponent.getUsername() + " new cards: " + opponent.getNum_cards());
 
                                         for (Opponent player : opponents) {
                                             if (player.getId() == opponent.getId()) {
-                                                // Update player's properties with the properties of the copy
+                                                // Update the opponent's info
                                                 player.setOpponent(opponent);
 
-
-                                                // Also show in gui
+                                                // Show in GUI
                                                 ClientController.setPlayerCards(opponent);
 
-                                                break; // No need to continue searching once found
+                                                break;
                                             }
                                         }
 
@@ -276,13 +327,16 @@ public class Client {
                             case GAME_UPDATE:
                                 switch (message.getGameUpdate()) {
                                     case FIRST_CARD:
-                                        System.out.println("[CLIENT] Received FIRST_CARD:");
+                                        // Update the card on the table
                                         lastPlayedCard = message.getCard();
 
+                                        // Set the game as started
                                         gameStarted = true;
 
-                                        // Add to GUI
+                                        // Add card to GUI
                                         ClientController.setLastPlayedCard(lastPlayedCard);
+
+                                        System.out.println("[CLIENT] Received FIRST_CARD:");
                                         break;
 
                                     case CARD_ADD:
@@ -290,51 +344,62 @@ public class Client {
 
                                         System.out.println("[CLIENT] Received CARD_ADD: " + card.getName());
 
-                                        // Add received card to deck
+                                        // Add card to player's deck
                                         player.addCard(card);
 
-                                        // Add to GUI
+                                        // Add card to GUI
                                         ClientController.addCard(card);
 
                                         break;
 
                                     case PLAYER_LIST_INIT:
-                                        System.out.println("[CLIENT] Received PLAYER_LIST_INIT with " + message.getOpponents().size() + " players.");
+                                        // Get the opponents list
                                         opponents = message.getOpponents();
 
+                                        // Add opponents to GUI
                                         for (Opponent player : opponents) {
                                             ClientController.addPlayerToList(player);
                                         }
+
+                                        System.out.println("[CLIENT] Received PLAYER_LIST_INIT with " + opponents.size() + " players.");
+
                                         break;
 
                                     case PLAYER_LIST_ADD:
-                                        System.out.println("[CLIENT] Received PLAYER_LIST_ADD: " + message.getOpponent().getUsername());
+                                        // Get the opponent from the Server
+                                        opponent = message.getOpponent();
 
-                                        // Update  the list
-                                        opponents.add(message.getOpponent());
+                                        // Update opponents list
+                                        opponents.add(opponent);
 
                                         // Update in GUI
-                                        ClientController.addPlayerToList(message.getOpponent());
+                                        ClientController.addPlayerToList(opponent);
+
+                                        System.out.println("[CLIENT] Received PLAYER_LIST_ADD: " + opponent.getUsername());
 
                                         break;
 
                                     case PLAYER_LIST_REMOVE:
-                                        System.out.println("[CLIENT] Received PLAYER_LIST_REMOVE: " + message.getOpponent().getUsername());
+                                        // Get the opponent from the Server
+                                        opponent = message.getOpponent();
 
                                         // Remove player from GUI
-                                        ClientController.removePlayerFromList(message.getOpponent().getId());
+                                        ClientController.removePlayerFromList(opponent.getId());
 
-                                        // Remove player from opponent list
-                                        opponents.remove(message.getOpponent());
+                                        // Remove player from opponents list
+                                        opponents.remove(opponent);
+
+                                        System.out.println("[CLIENT] Received PLAYER_LIST_REMOVE: " + message.getOpponent().getUsername());
 
                                         break;
 
                                     case PLAYER_CARDS_UPDATE:
-                                        System.out.println("[CLIENT] Received PLAYER_LIST_UPDATE");
-
+                                        // Get the id of the player
                                         idOpponent = message.getIdPlayerToUpdate();
+                                        // Get that player's updated number of cards
                                         num = message.getNum();
 
+                                        // Select the player from the opponents list
                                         for (int i = 0; i < opponents.size(); i++) {
                                             if (opponents.get(i).getId() == idOpponent) {
                                                 opponent= opponents.get(i);
@@ -344,44 +409,52 @@ public class Client {
                                             }
                                         }
 
+                                        // Make sure the getUsername() method doesn't throw a NullPointerException
                                         assert opponent != null;
+
                                         System.out.println(opponent.getUsername() + " new cards: " + opponent.getNum_cards());
 
                                         for (Opponent player : opponents) {
                                             if (player.getId() == opponent.getId()) {
-                                                // Update player's properties with the properties of the copy
+                                                // Update the opponent
                                                 player.setOpponent(opponent);
 
-
-                                                // Also show in gui
+                                                // Show in GUI
                                                 ClientController.setPlayerCards(opponent);
 
-                                                break; // No need to continue searching once found
+                                                break;
                                             }
                                         }
+
+                                        System.out.println("[CLIENT] Received PLAYER_LIST_UPDATE message.");
 
                                         break;
 
                                     case PLAYER_TURN:
+                                        // Since it's a new turn, the player did not say UNO
                                         saidUno = false;
 
+                                        // Get the player whore turn it is
                                         this.playerTurn = message.getOpponent();
-                                        // Update in GUI
 
+                                        // Check if the player is this client's player
+                                        // If it is, check if the player should skip turn
                                         if (playerTurn.getId() == player.getID() && playerTurn.getLeftSkipTurns() > 0) {
                                             skipTurn();
                                         } else {
                                             ClientController.setPlayerTurn(playerTurn.getUsername(), (playerTurn.getId() == player.getID()));
                                         }
 
+                                        System.out.println("[CLIENT] Received PLAYER_TURN message.");
                                         break;
 
                                     case PLAYER_SKIP_TURNS:
-                                        System.out.println("[CLIENT] Received PLAYER_SKIP_TURNS");
-
+                                        // Get the id of the player to be updated
                                         idOpponent = message.getIdPlayerToUpdate();
+                                        // Get the number of skips we should add
                                         num = message.getNum();
 
+                                        // Select the player from opponents list
                                         for (int i = 0; i < opponents.size(); i++) {
                                             if (opponents.get(i).getId() == idOpponent) {
                                                 opponent = opponents.get(i);
@@ -391,20 +464,24 @@ public class Client {
                                             }
                                         }
 
+                                        // Make sure the getUsername() method doesn't throw a NullPointerException
                                         assert opponent != null;
+
                                         System.out.println("[Client]: " + opponent.getUsername() + " skip turns: " + opponent.getLeftSkipTurns());
 
                                         for (Opponent player : opponents) {
                                             if (player.getId() == opponent.getId()) {
-                                                // Update player's properties with the properties of the copy
+                                                // Update the opponent's info
                                                 player.setOpponent(opponent);
 
-                                                // Also show in gui
+                                                // Show in GUI
                                                 ClientController.setPlayerSkipTurns(opponent);
 
-                                                break; // No need to continue searching once found
+                                                break;
                                             }
                                         }
+
+                                        System.out.println("[CLIENT] Received PLAYER_SKIP_TURNS message");
 
                                         break;
 
@@ -429,7 +506,9 @@ public class Client {
                                         break;
 
                                     case CARDS_STACK_ADD:
+                                        // Get card from Server
                                         card = message.getCard();
+                                        // Add to cards stack list
                                         cardsStack.add(card);
 
                                         // Add to GUI
@@ -438,6 +517,7 @@ public class Client {
                                         break;
 
                                     case CARDS_STACK_CLEAR:
+                                        // Remove all cards from card stack
                                         cardsStack.clear();
 
                                         // Clean cards stack from GUI
@@ -446,6 +526,7 @@ public class Client {
                                         break;
 
                                     case DIRECTION_CHANGE:
+                                        // Get direction from Server
                                         direction = message.getDirection();
 
                                         // Show in GUI
@@ -454,14 +535,15 @@ public class Client {
                                         break;
 
                                     case STOP_GAME:
-                                        // TODO
+                                        // Set game as not started
                                         gameStarted = false;
+
                                         break;
                                 }
                                 break;
                             case SERVER_SHUTDOWN:
-                                System.out.println("[CLIENT]: Server is shutting down, exiting.");
                                 closeEverything();
+                                System.out.println("[CLIENT]: Server is shutting down, exiting.");
 
                                 break;
                             default:
@@ -476,7 +558,7 @@ public class Client {
                     }
                 }
             } catch (SocketException se) {
-                System.out.println("[ClientHandler]: Socket closed by client.");
+                System.out.println("[CLIENT]: Socket closed by client.");
             } catch (IOException | ClassNotFoundException e) {
                 throw new RuntimeException(e);
             }
@@ -484,10 +566,14 @@ public class Client {
     }
 
     public void closeEverything() {
-        System.out.println("[Client]: Closing everything!");
+        System.out.println("[CLIENT]: Closing everything!");
+
         try {
             if (outputStream != null) {
                 outputStream.close();
+            }
+            if (inputStream != null) {
+                inputStream.close();
             }
             if (socket != null) {
                 socket.close();

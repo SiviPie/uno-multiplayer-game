@@ -35,17 +35,9 @@ public class Card implements Serializable {
 
     /*** SETTERS ***/
 
-    public void setType(CardType type) {
-        this.type = type;
-    }
-
     public void setColor(Color color) {
         // only for wild cards
         this.color = color;
-    }
-
-    public void setNumber(int number) {
-        this.number = number;
     }
 
     /*** GETTERS ***/
@@ -87,10 +79,6 @@ public class Card implements Serializable {
     }
 
     /*** OTHER METHODS ***/
-
-    public void showInfo() {
-        System.out.println( "Type: " + type + ((this.color != null) ? (" Color: " + color) : ("")) +   ((this.number >= 0) ? (" Number: " + number) : ("")));
-    }
 
     public Boolean isStackable() {
         return (this.type == CardType.Skip) || (this.type == CardType.Draw2) || (this.type == CardType.WildDraw4);
